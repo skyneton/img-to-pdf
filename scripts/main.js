@@ -132,7 +132,7 @@ document.getElementsByClassName("transform")[0].onclick = () => {
             doc.addPage();
     }
 
-    doc.save(`${document.getElementsByClassName("imageBox").getElementsByClassName("imageName")[0].innerText}.pdf`);
+    doc.save(`${document.getElementsByClassName("imageBox")[0].getElementsByClassName("imageName")[0].innerText}.pdf`);
 }
 
 const imageFileAdd = file => {
@@ -155,15 +155,15 @@ const imageFileAdd = file => {
     imageDivBox.appendChild(imageItem);
 
     const image = document.createElement("img");
-    // image.src = URL.createObjectURL(file);
+    image.src = URL.createObjectURL(file);
     image.setAttribute("draggable", false);
     imageItem.appendChild(image);
 
-    const reader = new FileReader();
-    reader.onload = () => {
-        image.src = reader.result;
-    }
-    reader.readAsDataURL(file);
+    // const reader = new FileReader();
+    // reader.onload = () => {
+    //     image.src = reader.result;
+    // }
+    // reader.readAsDataURL(file);
 
     const fileName = document.createElement("div");
     fileName.setAttribute("class", "imageName");
