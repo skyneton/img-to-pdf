@@ -166,39 +166,40 @@ document.getElementsByClassName("transform")[0].onclick = () => {
     const downloadPage = createLoadingPage("PDF를 생성중입니다.");
     document.body.appendChild(downloadPage);
 
-    try {
-        for(let i = 0; i < document.getElementsByClassName("imageBox").length; i++) {
-            const item = document.getElementsByClassName("imageBox")[i];
-            const img = item.getElementsByClassName("imageContainer")[0].getElementsByTagName("img")[0];
-            const width = img.naturalWidth * multiple;
-            const height = img.naturalHeight * multiple;
-            if(format == "auto") {
-                doc.setPageWidth(i + 1, width);
-                doc.setPageHeight(i + 1, height);
-                doc.addImage(img.src, "JPEG", 0, 0, doc.getPageWidth(i + 1), doc.getPageHeight(i + 1));
-            }else {
-                const persentage = (() => {
-                    if(width > doc.getPageWidth(i + 1) || height > doc.getPageHeight(i + 1))
+    setTimeout(() => {
+        try {
+            for(let i = 0; i < document.getElementsByClassName("imageBox").length; i++) {
+                const item = document.getElementsByClassName("imageBox")[i];
+                const img = item.getElementsByClassName("imageContainer")[0].getElementsByTagName("img")[0];
+                const width = img.naturalWidth * multiple;
+                const height = img.naturalHeight * multiple;
+                if(format == "auto") {
+                    doc.setPageWidth(i + 1, width);
+                    doc.setPageHeight(i + 1, height);
+                    doc.addImage(img.src, "JPEG", 0, 0, doc.getPageWidth(i + 1), doc.getPageHeight(i + 1));
+                }else {
+                    const persentage = (() => {
+                        if(width > doc.getPageWidth(i + 1) || height > doc.getPageHeight(i + 1))
+                            return ((doc.getPageWidth(i + 1)/width > doc.getPageHeight(i + 1)/height) ?
+                                doc.getPageHeight(i + 1)/height :
+                                doc.getPageWidth(i + 1)/width);
+
                         return ((doc.getPageWidth(i + 1)/width > doc.getPageHeight(i + 1)/height) ?
                             doc.getPageHeight(i + 1)/height :
                             doc.getPageWidth(i + 1)/width);
-
-                    return ((doc.getPageWidth(i + 1)/width > doc.getPageHeight(i + 1)/height) ?
-                        doc.getPageHeight(i + 1)/height :
-                        doc.getPageWidth(i + 1)/width);
-                })();
-                const subWidth = (doc.getPageWidth(i + 1) - width * persentage)/2;
-                const subHeight = (doc.getPageHeight(i + 1) - height * persentage)/2;
-                doc.addImage(img.src, "JPEG", subWidth / 2, subHeight / 2, doc.getPageWidth(i + 1) - subWidth, doc.getPageHeight(i + 1) - subHeight);
+                    })();
+                    const subWidth = (doc.getPageWidth(i + 1) - width * persentage)/2;
+                    const subHeight = (doc.getPageHeight(i + 1) - height * persentage)/2;
+                    doc.addImage(img.src, "JPEG", subWidth / 2, subHeight / 2, doc.getPageWidth(i + 1) - subWidth, doc.getPageHeight(i + 1) - subHeight);
+                }
+                if(i < document.getElementsByClassName("imageBox").length - 1)
+                    doc.addPage();
             }
-            if(i < document.getElementsByClassName("imageBox").length - 1)
-                doc.addPage();
-        }
 
-        doc.save(`${document.getElementsByClassName("imageBox")[0].getElementsByClassName("imageName")[0].innerText}.pdf`);
-    }catch {}
-
-    downloadPage.remove();
+            doc.save(`${document.getElementsByClassName("imageBox")[0].getElementsByClassName("imageName")[0].innerText}.pdf`);
+        }catch {}
+        downloadPage.remove();
+    });
 }
 
 const imageFileAdd = file => {
@@ -224,17 +225,30 @@ const imageFileAdd = file => {
     canvas.setAttribute("class", "imageCanvas");
 
     const image = document.createElement("img");
+    let checked = false;
+    image.onload = () => {
+        if(!!document.createElement("canvas").getContext && !checked) {
+            checked = true;
+            setTimeout(() => {
+                try {
+                    const canvas = document.createElement("canvas");
+                    const width = image.naturalWidth * 0.8;
+                    const height = image.naturalHeight * 0.8;
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.getContext("2d").drawImage(image, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
+                    image.src = URL.createObjectURL(dataURLToBlob(dataUrl));
+                }catch(e) { }
+            }, 5);
+        }
+    }
+
     image.src = URL.createObjectURL(file);
     image.setAttribute("draggable", false);
 
     canvas.appendChild(image);
     imageItem.appendChild(canvas);
-
-    // const reader = new FileReader();
-    // reader.onload = () => {
-    //     image.src = reader.result;
-    // }
-    // reader.readAsDataURL(file);
 
     const fileName = document.createElement("div");
     fileName.setAttribute("class", "imageName");
@@ -312,4 +326,27 @@ const createLoadingPage = (msg) => {
     box.appendChild(progressBar);
 
     return box;
+}
+
+const dataURLToBlob = url => {
+    const BASE64_MARKER = ";base64,";
+    if(url.indexOf(BASE64_MARKER) == -1) {
+        const parts = url.split(",");
+        const contentType = parts[0].split(":")[1];
+        const raw = parts[1];
+
+        return new Blob([raw], { type: contentType });
+    }
+
+    const parts = url.split(BASE64_MARKER);
+    const contentType = parts[0].split(":")[1];
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+
+    const uInt8Array = new Uint8Array(rawLength);
+    for(let i = 0; i < rawLength; i++) {
+        uInt8Array[i] = raw.charCodeAt(i);
+    }
+
+    return new Blob([uInt8Array], { type: contentType });
 }
