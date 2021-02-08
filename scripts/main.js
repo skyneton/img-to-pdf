@@ -113,7 +113,7 @@ window.onmouseup = () => {
 
 document.getElementsByClassName("transform")[0].onclick = () => {
     if(document.getElementsByClassName("imageBox").length <= 0) return;
-    
+
     const orientation = document.getElementsByClassName("pdfOptionOrientation")[0].value;
     const util = document.getElementsByClassName("pdfOptionUtil")[0].value;
     const format = document.getElementsByClassName("pdfOptionFormat")[0].value;
@@ -124,10 +124,11 @@ document.getElementsByClassName("transform")[0].onclick = () => {
 
     //https://www.giftofspeed.com/base64-encoder/
 
-    document.getElementsByClassName("imageBox").forEach(item => {
+    for(let i = 0; i < document.getElementsByClassName("imageBox").length; i++) {
+        const item = document.getElementsByClassName("imageBox")[i];
         const img = item.getElementsByClassName("imageContainer")[0].getElementsByTagName("img");
         doc.addImage(img, "JPEG", 0, 0);
-    });
+    }
 
     doc.save(`${document.getElementsByClassName("imageBox").getElementsByClassName("imageName")[0].innerText}.pdf`);
 }
