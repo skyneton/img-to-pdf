@@ -225,22 +225,24 @@ const imageFileAdd = file => {
     canvas.setAttribute("class", "imageCanvas");
 
     const image = document.createElement("img");
-    let checked = false;
-    image.onload = () => {
-        if(!!document.createElement("canvas").getContext && !checked) {
-            checked = true;
-            setTimeout(() => {
-                try {
-                    const canvas = document.createElement("canvas");
-                    const width = image.naturalWidth * 0.8;
-                    const height = image.naturalHeight * 0.8;
-                    canvas.width = width;
-                    canvas.height = height;
-                    canvas.getContext("2d").drawImage(image, 0, 0, width, height);
-                    const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
-                    image.src = URL.createObjectURL(dataURLToBlob(dataUrl));
-                }catch(e) { }
-            }, 5);
+    if(document.getElementsByClassName("imgCompress")[0].checked) {
+        let checked = false;
+        image.onload = () => {
+            if(!!document.createElement("canvas").getContext && !checked) {
+                checked = true;
+                setTimeout(() => {
+                    try {
+                        const canvas = document.createElement("canvas");
+                        const width = image.naturalWidth * 0.8;
+                        const height = image.naturalHeight * 0.8;
+                        canvas.width = width;
+                        canvas.height = height;
+                        canvas.getContext("2d").drawImage(image, 0, 0, width, height);
+                        const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
+                        image.src = URL.createObjectURL(dataURLToBlob(dataUrl));
+                    }catch(e) { }
+                });
+            }
         }
     }
 
