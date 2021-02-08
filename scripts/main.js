@@ -75,7 +75,7 @@ document.getElementsByClassName("orderByCommandBtn")[0].onclick = () => {
 }
 
 document.getElementsByClassName("pdfOptionFormat")[0].onchange = () => {
-    if(event.target.value != "legal")
+    if(event.target.value != "auto")
         document.getElementsByClassName("pdfOptionOrientation")[0].disabled = false;
     else
         document.getElementsByClassName("pdfOptionOrientation")[0].disabled = true;
@@ -117,7 +117,10 @@ document.getElementsByClassName("transform")[0].onclick = () => {
     const orientation = document.getElementsByClassName("pdfOptionOrientation")[0].value;
     const util = document.getElementsByClassName("pdfOptionUtil")[0].value;
     const format = document.getElementsByClassName("pdfOptionFormat")[0].value;
-    const doc = new jspdf.jsPDF(orientation, util, format);
+    const doc = new jspdf.jsPDF({
+        orientation: orientation,
+        unit: util,
+    });
     doc.addFileToVFS("malgun.ttf", malgun);
     doc.addFont("malgun.ttf", "malgun", "normal");
     doc.setFont("malgun");
@@ -127,7 +130,39 @@ document.getElementsByClassName("transform")[0].onclick = () => {
     for(let i = 0; i < document.getElementsByClassName("imageBox").length; i++) {
         const item = document.getElementsByClassName("imageBox")[i];
         const img = item.getElementsByClassName("imageContainer")[0].getElementsByTagName("img")[0];
-        doc.addImage(img.src, "JPEG", 0, 0);
+        const multiple = (() => {
+            switch(util) {
+                case "pt":
+                    return 0.75;
+                case "mm":
+                    return 0.2645833333;
+                case "cm":
+                    return 0.02645833333333;
+                case "in":
+                    return 0.01041666666667;
+            }
+        })();
+        const width = img.naturalWidth * multiple;
+        const height = img.naturalHeight * multiple;
+        if(format == "auto") {
+            doc.setPageWidth(i + 1, width);
+            doc.setPageHeight(i + 1, height);
+            doc.addImage(img.src, "JPEG", 0, 0, doc.getPageWidth(i + 1), doc.getPageHeight(i + 1));
+        }else {
+            const persentage = (() => {
+                if(width > doc.getPageWidth(i + 1) || height > doc.getPageHeight(i + 1))
+                    return ((doc.getPageWidth(i + 1)/width > doc.getPageHeight(i + 1)/height) ?
+                        doc.getPageHeight(i + 1)/height :
+                        doc.getPageWidth(i + 1)/width);
+
+                return ((doc.getPageWidth(i + 1)/width > doc.getPageHeight(i + 1)/height) ?
+                    doc.getPageHeight(i + 1)/height :
+                    doc.getPageWidth(i + 1)/width);
+            })();
+            const subWidth = (doc.getPageWidth(i + 1) - width * persentage)/2;
+            const subHeight = (doc.getPageHeight(i + 1) - height * persentage)/2;
+            doc.addImage(img.src, "JPEG", subWidth / 2, subHeight / 2, doc.getPageWidth(i + 1) - subWidth, doc.getPageHeight(i + 1) - subHeight);
+        }
         if(i < document.getElementsByClassName("imageBox").length - 1)
             doc.addPage();
     }
