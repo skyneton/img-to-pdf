@@ -1,0 +1,229 @@
+body {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+	font-family: Inter, Roobert, Arial, Helvetica, sans-serif;
+}
+body > .deleteBtn {
+    display: none;
+}
+
+.inpFile {
+    display: none;
+}
+
+.topbar {
+    padding: 7px;
+    padding-bottom: 0;
+    flex-shrink: 0;
+}
+
+.transformBox {
+    display: flex;
+    flex-direction: row-reverse;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgb(194, 194, 194);
+}
+
+.transform {
+    color: white;
+    background-color: #0055ff;
+    cursor: pointer;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: bold;
+    outline: none;
+    justify-self: flex-end;
+    flex-shrink: 0;
+}.transform:hover {
+    background-color: rgb(0, 75, 245);
+}.transform:active {
+    background-color: rgb(0, 55, 225);
+}
+
+.topbarOptionsBox {
+    display: flex;
+    align-items: center;
+    padding: 7px;
+    border-bottom: 2px solid rgb(194, 194, 194);
+}.topbarOptionsBox > * {
+    margin-right: 7px;
+}.orderByBox {
+    display: inline-block;
+    position: relative;
+}.orderByCommandBtn {
+    background-color: white;
+    border: 1px solid rgb(194, 194, 194);
+    border-radius: 7px;
+    padding: 0 12px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    margin-right: 0;
+    outline: none;
+    box-sizing: border-box;
+    height: 32px;
+    float: left;
+}.orderByCommandBtn:hover {
+    background-color: rgb(244, 244, 244);
+    border-left-color: black;
+    border-top-color: black;
+    border-bottom-color: black;
+}.orderByCommandBtn:hover ~ .orderByTypeBtn {
+    border-right-color: black;
+    border-top-color: black;
+    border-bottom-color: black;
+}.orderByTypeBtn {
+    background-color: white;
+    margin-left: 0;
+    border-radius: 7px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border: 1px solid rgb(194, 194, 194);
+    border-left-color: rgb(224, 224, 224);
+    padding: 8px;
+    outline: none;
+    box-sizing: border-box;
+    height: 32px;
+}.orderByTypeBtn:hover {
+    background-color: rgb(244, 244, 244);
+    border-color: black;
+}.orderByTypeBtn:active {
+    background-color: rgb(224, 224, 224);
+    border-color: black;
+}.orderByTypeBtn[active] {
+    background-color: rgb(224, 224, 224);
+    border-color: black;
+}.orderByTypeBtn > svg {
+    width: 15px;
+    height: 15px;
+}.orderByOptionSet {
+    display: none;
+    position: absolute;
+    right: 0;
+    margin-top: 5px;
+    background-color: white;
+    box-shadow: 0px 0px 2px rgb(58, 58, 58);
+    border-radius: 4px;
+    box-sizing: border-box;
+}.orderByOptionSet > button:nth-child(1) {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}.orderByOptionSet > button:last-child {
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}.orderByOptionSet > button {
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    outline: none;
+}.orderByOptionSet > button:hover {
+    background-color: rgb(247, 247, 247);
+}.orderByOptionSet > button:active {
+    background-color: rgb(226, 226, 226);
+}.orderByTypeBtn[active] + .orderByOptionSet {
+    display: block;
+}
+
+.pdfOptionSetting {
+    height: 32px;
+    box-sizing: border-box;
+    border-radius: 7px;
+}
+
+.imageListBox {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    flex-grow: 1;
+    flex-basis: 0;
+    justify-content: center;
+    background-color: rgb(250, 250, 250);
+}.imageListBox > * {
+    margin: 8px 3px;
+}
+
+.fileAddBox {
+    width: 170px;
+    box-sizing: border-box;
+    cursor: pointer;
+    margin: 30px;
+}.fileAddBoxFrame {
+    padding-top: 100%;
+    position: relative;
+    width: 100%;
+}.fileAddBoxContent {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    border-radius: 50%;
+    background-color: rgb(234, 234, 234);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    box-sizing: border-box;
+}.fileAddBoxContent:hover {
+    background-color: rgb(224, 224, 224);
+}.fileAddBox:active .fileAddBoxContent {
+    background-color: rgb(214, 214, 214);
+}.fileAddBoxContent > svg {
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+}
+
+.imageBox {
+    display: flex;
+    width: 210px;
+    height: 260px;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+    cursor: move;
+}.imageBox:hover {
+    background-color: rgb(244, 244, 244);
+}.imageBox > .deleteBtn {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    visibility: hidden;
+    cursor: pointer;
+    padding: 5px;
+    box-sizing: border-box;
+}.imageBox:hover > .deleteBtn {
+    visibility: visible;
+}.imageBox > .deleteBtn:hover {
+    background-color: rgb(214, 214, 214);
+} .imageBox > .imageContainer {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin: 5px;
+    box-sizing: border-box;
+    width: 100%;
+    position: relative;
+} .imageContainer > img {
+    position: absolute;
+    max-width: 100%;
+    max-height: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}.imageBox[dragloc="0"] {
+    box-shadow: -6px 0px 0px 0px orange;
+}.imageBox[dragloc="1"] {
+    box-shadow: 6px 0px 0px 0px orange;
+}

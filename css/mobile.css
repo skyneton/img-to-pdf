@@ -1,0 +1,8 @@
+@media (max-width: 540px) {
+    .topbarOptionsBox {
+        display: none;
+    }
+    .transformBox {
+        border-bottom: 2px solid rgb(194, 194, 194);
+    }
+}
