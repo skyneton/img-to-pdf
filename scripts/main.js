@@ -127,7 +127,7 @@ document.getElementsByClassName("transform")[0].onclick = () => {
     for(let i = 0; i < document.getElementsByClassName("imageBox").length; i++) {
         const item = document.getElementsByClassName("imageBox")[i];
         const img = item.getElementsByClassName("imageContainer")[0].getElementsByTagName("img");
-        doc.addImage(img, "JPEG", 0, 0);
+        doc.addImage(img.src, "JPEG", 0, 0);
         if(i < document.getElementsByClassName("imageBox").length - 1)
             doc.addPage();
     }
