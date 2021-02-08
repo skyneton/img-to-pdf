@@ -5,4 +5,55 @@
     .transformBox {
         border-bottom: 2px solid rgb(194, 194, 194);
     }
+    .imageBox {
+        width: 310px;
+        height: 360px;
+    }.imageBox > .imageContainer {
+        height: 310px;
+    }.imageCanvas {
+        background-color: white;
+        display: inline-block;
+        margin: auto;
+        max-width: 300px;
+        max-height: 300px;
+        box-shadow: 1px 1px 3px gray;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }.imageCanvas img {
+        max-width: 300px;
+        max-height: 300px;
+    }.imageListBox[format="a"] .imageBox .imageCanvas {
+        width: 212px;
+        height: 300px;
+    }.imageListBox[format="b"] .imageBox .imageCanvas {
+        width: 300px;
+        height: 212px;
+    }
+}@media (max-width: 850px) {
+    .imageBox {
+        width: 260px;
+        height: 310px;
+    }.imageBox > .imageContainer {
+        height: 260px;
+    }.imageCanvas {
+        background-color: white;
+        display: inline-block;
+        margin: auto;
+        max-width: 250px;
+        max-height: 250px;
+        box-shadow: 1px 1px 3px gray;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }.imageCanvas img {
+        max-width: 250px;
+        max-height: 250px;
+    }.imageListBox[format="a"] .imageBox .imageCanvas {
+        width: 176px;
+        height: 250px;
+    }.imageListBox[format="b"] .imageBox .imageCanvas {
+        width: 250px;
+        height: 176px;
+    }
 }
