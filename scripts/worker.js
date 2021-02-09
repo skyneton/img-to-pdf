@@ -20,7 +20,7 @@ const worker_function = () => {
                 const subHeight = (self.doc.getPageHeight(page) - height * persentage)/2;
                 self.doc.addImage(src, "JPEG", subWidth, subHeight, self.doc.getPageWidth(page) - subWidth, self.doc.getPageHeight(page) - subHeight);
             }
-        }catch {}
+        }catch(e) { console.log(e); }
     }
 
     self.addEventListener("message", (data) => {
