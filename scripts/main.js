@@ -161,6 +161,10 @@ document.getElementsByClassName("transform")[0].onclick = () => {
 
         worker.addEventListener("message", (data) => {
             console.log(data.data);
+            const link = document.createElement("a");
+            link.href = data.data;
+            link.download = "test.pdf";
+            link.click();
             downloadPage.remove();
             worker.terminate();
         });
