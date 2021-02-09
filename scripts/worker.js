@@ -60,14 +60,14 @@ const worker_function = () => {
                 break;
             }
             case "data": {
-                console.log(packet.page);
                 addImage(packet.page,packet.src,packet.width,packet.height);
-                console.log(`${packet.page} DONE`);
-                if(++self.now >= self.len) {
+                self.now++;
+                if(self.now >= self.len) {
                     console.log("FINISH");
                     self.doc.save(self.name);
                     self.postMessage("finish");
                 }
+                console.log(self.now +", " + self.len);
                 break;
             }
         }
