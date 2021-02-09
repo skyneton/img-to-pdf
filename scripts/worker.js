@@ -60,12 +60,8 @@ const worker_function = () => {
             case "data": {
                 addImage(packet.page,packet.src,packet.width,packet.height);
                 if(++self.now >= self.len) {
-                    (async () => {
-                        console.log("START");
-                        await self.doc.save("test.pdf");
-                        console.log("ASDF");
-                        self.postMessage("finish");
-                    })();
+                    self.doc.save("test.pdf");
+                    // self.postMessage("finish");
                 }
                 break;
             }
