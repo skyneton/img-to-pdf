@@ -138,89 +138,51 @@ document.getElementsByClassName("clear")[0].onclick = () => {
 document.getElementsByClassName("transform")[0].onclick = () => {
     if(document.getElementsByClassName("imageBox").length <= 0) return;
 
-    const orientation = document.getElementsByClassName("pdfOptionOrientation")[0].value;
-    const util = document.getElementsByClassName("pdfOptionUtil")[0].value;
-    const format = document.getElementsByClassName("pdfOptionFormat")[0].value;
-    const doc = new jspdf.jsPDF({
-        orientation: orientation,
-        unit: util,
-    });
-    doc.addFileToVFS("malgun.ttf", malgun);
-    doc.addFont("malgun.ttf", "malgun", "normal");
-    doc.setFont("malgun");
-
     //https://www.giftofspeed.com/base64-encoder/
-    const multiple = (() => {
-        switch(util) {
-            case "pt":
-                return 0.75;
-            case "mm":
-                return 0.2645833333;
-            case "cm":
-                return 0.02645833333333;
-            case "in":
-                return 0.01041666666667;
-        }
-    })();
 
     const downloadPage = createLoadingPage("PDF를 생성중입니다.");
     document.body.appendChild(downloadPage);
 
-    const imageBoxList = document.getElementsByClassName("imageBox");
-
     try {
-        async () => {
-            const finished = new function() {
-                let finished = 0;
-                this.add = () => { return ++finished; }
-                this.get = () => { return finished; }
-            };
-            for(let i = 0; i < imageBoxList.length; i++) {
-                if(i > 0)
-                    doc.addPage();
-                
-                await addImage(multiple, doc, i + 1, format, downloadPage, finished, imageBoxList);
-            }
+        const worker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})));
+        const imageBoxList = document.getElementsByClassName("imageBox");
+        const packet = {
+            url: URL.createObjectURL(new Blob(["("+jspdf.toString()+")()"], {type: 'text/javascript'})),
+            font: malgun,
+            orientation: document.getElementsByClassName("pdfOptionOrientation")[0].value,
+            util: document.getElementsByClassName("pdfOptionUtil")[0].value,
+            format: document.getElementsByClassName("pdfOptionFormat")[0].value,
+            len: imageBoxList.length,
+            name: `${imageBoxList[0].getElementsByClassName("imageName")[0].innerText}.pdf`,
+            type: "build"
         }
-    }catch {
+        worker.postMessage(packet);
+
+        worker.addEventListener("message", (data) => {
+            downloadPage.remove();
+            worker.terminate();
+        });
+
+        for(let i = 0; i < imageBoxList.length; i++) {
+            const item = imageBoxList[i];
+            const img = item.getElementsByTagName("img")[0];
+            const data = {
+                src: (() => {
+                    if(document.getElementsByClassName("pdfOptionCompress")[0].value == 0)
+                        return img.src;
+                    return imgCompress(img);
+                })(),
+                width: img.naturalWidth,
+                height: img.naturalHeight,
+                page: i + 1,
+                type: "data"
+            }
+            worker.postMessage(data);
+        }
+    }catch(e) {
+        console.log(e);
         downloadPage.remove();
     }
-}
-
-const addImage = (multiple, doc, page, format, downloadPage, finished, imageBoxList) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const item = imageBoxList[page - 1];
-            const img = item.getElementsByTagName("img")[0];
-            const width = img.naturalWidth * multiple;
-            const height = img.naturalHeight * multiple;
-                        
-            let src = img.src;
-            if(document.getElementsByClassName("pdfOptionCompress")[0].value != 0)
-                src = imgCompress(img);
-            try {
-                doc.setPage(page);
-                if(format == "auto") {
-                    doc.setPageWidth(page, width);
-                    doc.setPageHeight(page, height);
-                    doc.addImage(src, "JPEG", 0, 0, width, height);
-                }else {
-                    const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ?
-                            doc.getPageHeight(page)/height :
-                            doc.getPageWidth(page)/width);
-                    const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
-                    const subHeight = (doc.getPageHeight(page) - height * persentage)/2;
-                    doc.addImage(src, "JPEG", subWidth, subHeight, doc.getPageWidth(page) - subWidth, doc.getPageHeight(page) - subHeight);
-                }
-            }catch {}
-            if(finished.add() >= imageBoxList.length) {
-                downloadPage.remove();
-                doc.save(`${imageBoxList[0].getElementsByClassName("imageName")[0].innerText}.pdf`);
-            }
-
-            resolve("finish");
-        });
-    });
 }
 
 const imageFileAdd = file => {
