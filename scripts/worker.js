@@ -38,6 +38,8 @@ const worker_function = () => {
                 self.doc.addFont("malgun.ttf", "malgun", "normal");
                 self.doc.setFont("malgun");
 
+                console.log(self.doc);
+
                 self.format = packet.format;
                 self.compress = packet.compress;
                 self.len = packet.length;
