@@ -5,7 +5,6 @@ const worker_function = () => {
     let doc;
 
     const addImage = (page, src, width, height, format) => {
-        console.log(doc.getNumberOfPages() + ", " + page + ", " + src + "," + width + ", " + height);
 		try {
         doc.setPage(page);
         if(format == "auto") {
