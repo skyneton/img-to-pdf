@@ -176,7 +176,7 @@ document.getElementsByClassName("transform")[0].onclick = () => {
                 
                 let src = img.src;
                 if(document.getElementsByClassName("pdfOptionCompress")[0].value != 0)
-                    src = imgCompress(image);
+                    src = imgCompress(img);
                 
                 if(format == "auto") {
                     doc.setPageWidth(i + 1, width);
@@ -195,7 +195,7 @@ document.getElementsByClassName("transform")[0].onclick = () => {
             }
 
             doc.save(`${document.getElementsByClassName("imageBox")[0].getElementsByClassName("imageName")[0].innerText}.pdf`);
-        }catch(e) { }
+        }catch(e) { console.log(e); }
         downloadPage.remove();
     });
 }
@@ -223,7 +223,6 @@ const imageFileAdd = file => {
     canvas.setAttribute("class", "imageCanvas");
 
     const image = document.createElement("img");
-    let checked = false;
     image.src = URL.createObjectURL(file);
     image.setAttribute("draggable", false);
 
@@ -333,6 +332,7 @@ const dataURLToBlob = url => {
 
 const imgCompress = image => {
     let result = image.src;
+    let checked = false;
     if(!!document.createElement("canvas").getContext && !checked) {
         checked = true;
         setTimeout(() => {
@@ -343,7 +343,7 @@ const imgCompress = image => {
                 canvas.width = width;
                 canvas.height = height;
                 canvas.getContext("2d").drawImage(image, 0, 0, width, height);
-                const dataUrl = canvas.toDataURL("image/jpeg", (() => {
+                result = canvas.toDataURL("image/jpeg", (() => {
                     switch(document.getElementsByClassName("pdfOptionCompress")[0].value) {
                         case 1: return 0.9;
                         case 2: return 0.75;
@@ -351,7 +351,7 @@ const imgCompress = image => {
                         default: return 1;
                     }
                 })());
-                result = URL.createObjectURL(dataURLToBlob(dataUrl));
+                // result = URL.createObjectURL(dataURLToBlob(dataUrl));
             }catch(e) { }
         });
     }
