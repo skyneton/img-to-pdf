@@ -32,7 +32,10 @@ const worker_function = () => {
                 self.doc = new jspdf.jsPDF({
                     orientation: packet.orientation,
                     unit: packet.util,
-                    format: packet.format
+                    format: (() => {
+                        if(packet.format == "auto") return "a4";
+                        return packet.format;
+                    })()
                 });
                 self.doc.addFileToVFS("malgun.ttf", packet.font);
                 self.doc.addFont("malgun.ttf", "malgun", "normal");
@@ -58,7 +61,7 @@ const worker_function = () => {
                 break;
             }
             case "data": {
-                if(packet.page > 1) packet.addPage();
+                if(packet.page > 1) self.doc.addPage();
                 addImage(packet.page,packet.src,packet.width,packet.height);
                 if(++self.now >= self.len) {
                     self.postMessage(URL.createObjectURL(new Blob([self.doc.output()], {type: "application/pdf"})));
