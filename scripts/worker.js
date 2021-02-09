@@ -61,10 +61,11 @@ const worker_function = () => {
                 addImage(packet.page,packet.src,packet.width,packet.height);
                 if(++self.now >= self.len) {
                     (async () => {
+                        console.log("START");
                         await self.doc.save("test.pdf");
                         console.log("ASDF");
                         self.postMessage("finish");
-                    });
+                    })();
                 }
                 break;
             }
