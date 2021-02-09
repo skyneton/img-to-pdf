@@ -357,4 +357,5 @@ const imgCompress = image => {
             }catch(e) { }
         });
     }
+    return result;
 }
