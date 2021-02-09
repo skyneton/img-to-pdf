@@ -1,4 +1,3 @@
-// import {jsPDF} from "jspdf";
 let pdfBlockMove;
 
 const fileDragOverEvent = event => {
@@ -143,52 +142,39 @@ document.getElementsByClassName("transform")[0].onclick = () => {
     const downloadPage = createLoadingPage("PDF를 생성중입니다.");
     document.body.appendChild(downloadPage);
 
-    try {
-        const worker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})));
-        window.test = "ASDF";
-        const imageBoxList = document.getElementsByClassName("imageBox");
-        const packet = {
-            url: URL.createObjectURL(new Blob(["("+jspdf.toString()+")()"], {type: 'text/javascript'})),
-            font: malgun,
-            orientation: document.getElementsByClassName("pdfOptionOrientation")[0].value,
-            util: document.getElementsByClassName("pdfOptionUtil")[0].value,
-            format: document.getElementsByClassName("pdfOptionFormat")[0].value,
-            len: imageBoxList.length,
-            name: `${imageBoxList[0].getElementsByClassName("imageName")[0].innerText}.pdf`,
-            type: "build"
+    const orientation = document.getElementsByClassName("pdfOptionOrientation")[0].value;
+    const util = document.getElementsByClassName("pdfOptionUtil")[0].value;
+    const format = document.getElementsByClassName("pdfOptionFormat")[0].value;
+    const imageList = document.getElementsByClassName("imageBox");
+    const multiple = (() => {
+        switch(util) {
+            case "pt":
+                return 0.75;
+            case "mm":
+                return 0.2645833333;
+            case "cm":
+                return 0.02645833333333;
+            case "in":
+                return 0.01041666666667;
         }
-        worker.postMessage(packet);
+    })();
+    const compress = document.getElementsByClassName("pdfOptionCompress")[0].value;
 
-        worker.addEventListener("message", (data) => {
-            console.log(data.data);
-            const link = document.createElement("a");
-            link.href = data.data;
-            link.download = "test.pdf";
-            link.click();
-            downloadPage.remove();
-            worker.terminate();
-        });
-
-        for(let i = 0; i < imageBoxList.length; i++) {
-            const item = imageBoxList[i];
-            const img = item.getElementsByTagName("img")[0];
-            const data = {
-                src: (() => {
-                    if(document.getElementsByClassName("pdfOptionCompress")[0].value == 0)
-                        return img.src;
-                    return imgCompress(img);
-                })(),
-                width: img.naturalWidth,
-                height: img.naturalHeight,
-                page: i + 1,
-                type: "data"
-            }
-            worker.postMessage(data);
+    setTimeout(() => {
+        if(location.protocol.startsWith("http")) {
+            imageListPDFByThread(downloadPage, orientation, util, format, multiple, imageList, compress).catch((e) => {
+                console.error(e);
+                downloadPage.remove();
+                alert("알수없는 오류!");
+            });
+        }else {
+            imageListPDF(downloadPage, orientation, util, format, multiple, imageList, compress).catch((e) => {
+                console.error(e);
+                downloadPage.remove();
+                alert("알수없는 오류!");
+            });
         }
-    }catch(e) {
-        console.log(e);
-        downloadPage.remove();
-    }
+    }, 700);
 }
 
 const imageFileAdd = file => {
@@ -296,51 +282,4 @@ const createLoadingPage = (msg) => {
     box.appendChild(progressBar);
 
     return box;
-}
-
-const dataURLToBlob = url => {
-    const BASE64_MARKER = ";base64,";
-    if(url.indexOf(BASE64_MARKER) == -1) {
-        const parts = url.split(",");
-        const contentType = parts[0].split(":")[1];
-        const raw = parts[1];
-
-        return new Blob([raw], { type: contentType });
-    }
-
-    const parts = url.split(BASE64_MARKER);
-    const contentType = parts[0].split(":")[1];
-    const raw = window.atob(parts[1]);
-    const rawLength = raw.length;
-
-    const uInt8Array = new Uint8Array(rawLength);
-    for(let i = 0; i < rawLength; i++) {
-        uInt8Array[i] = raw.charCodeAt(i);
-    }
-
-    return new Blob([uInt8Array], { type: contentType });
-}
-
-const imgCompress = image => {
-    let result = image.src;
-    if(!!document.createElement("canvas").getContext) {
-        try {
-            const canvas = document.createElement("canvas");
-            const width = image.naturalWidth;
-            const height = image.naturalHeight;
-            canvas.width = width;
-            canvas.height = height;
-            canvas.getContext("2d").drawImage(image, 0, 0, width, height);
-            const dataUrl = canvas.toDataURL("image/jpeg", (() => {
-                switch(parseInt(document.getElementsByClassName("pdfOptionCompress")[0].value)) {
-                    case 1: return 0.9;
-                    case 2: return 0.75;
-                    case 3: return 0.6;
-                    default: return 1;
-                }
-            })());
-            result = URL.createObjectURL(dataURLToBlob(dataUrl));
-        }catch(e) { }
-    }
-    return result;
 }
