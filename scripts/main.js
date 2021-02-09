@@ -177,8 +177,6 @@ document.getElementsByClassName("transform")[0].onclick = () => {
                 let src = img.src;
                 if(document.getElementsByClassName("pdfOptionCompress")[0].value != 0)
                     src = imgCompress(image);
-                if(document.getElementsByClassName("imgCompress")[0].checked && img.compressSrc)
-                    src = img.compressSrc;
                 
                 if(format == "auto") {
                     doc.setPageWidth(i + 1, width);
@@ -197,7 +195,7 @@ document.getElementsByClassName("transform")[0].onclick = () => {
             }
 
             doc.save(`${document.getElementsByClassName("imageBox")[0].getElementsByClassName("imageName")[0].innerText}.pdf`);
-        }catch {}
+        }catch(e) { }
         downloadPage.remove();
     });
 }
