@@ -28,7 +28,7 @@ const worker_function = () => {
         switch(packet.type) {
             case "build": {
                 importScripts(packet.url);
-                
+
                 self.doc = new jspdf.jsPDF({
                     orientation: packet.orientation,
                     unit: packet.util,
@@ -58,6 +58,7 @@ const worker_function = () => {
                 break;
             }
             case "data": {
+                console.log(packet.page);
                 addImage(packet.page,packet.src,packet.width,packet.height);
                 if(++self.now >= self.len) {
                     self.doc.save(self.name);
