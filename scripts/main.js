@@ -145,6 +145,7 @@ document.getElementsByClassName("transform")[0].onclick = () => {
 
     try {
         const worker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})));
+        window.test = "ASDF";
         const imageBoxList = document.getElementsByClassName("imageBox");
         const packet = {
             url: URL.createObjectURL(new Blob(["("+jspdf.toString()+")()"], {type: 'text/javascript'})),
@@ -159,6 +160,7 @@ document.getElementsByClassName("transform")[0].onclick = () => {
         worker.postMessage(packet);
 
         worker.addEventListener("message", (data) => {
+            console.log(data.data);
             downloadPage.remove();
             worker.terminate();
         });

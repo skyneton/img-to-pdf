@@ -60,10 +60,7 @@ const worker_function = () => {
             case "data": {
                 addImage(packet.page,packet.src,packet.width,packet.height);
                 if(++self.now >= self.len) {
-                    console.log("ASDF");
-                    self.doc.save("test.pdf");
-                    console.log("ASDF2");
-                    // self.postMessage("finish");
+                    self.postMessage(URL.createObjectURL(new Blob([self.doc.output()], {type: "application/pdf"})));
                 }
                 break;
             }
