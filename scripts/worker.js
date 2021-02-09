@@ -58,6 +58,7 @@ const worker_function = () => {
                 break;
             }
             case "data": {
+                if(packet.page > 1) packet.addPage();
                 addImage(packet.page,packet.src,packet.width,packet.height);
                 if(++self.now >= self.len) {
                     self.postMessage(URL.createObjectURL(new Blob([self.doc.output()], {type: "application/pdf"})));
