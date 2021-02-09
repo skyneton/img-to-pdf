@@ -38,11 +38,9 @@ const worker_function = () => {
                 self.doc.addFont("malgun.ttf", "malgun", "normal");
                 self.doc.setFont("malgun");
 
-                console.log(self.doc);
-
                 self.format = packet.format;
                 self.compress = packet.compress;
-                self.len = packet.length;
+                self.len = packet.len;
                 self.now = 0;
                 self.name = packet.name;
                 self.multiple = (() => {
@@ -61,13 +59,11 @@ const worker_function = () => {
             }
             case "data": {
                 addImage(packet.page,packet.src,packet.width,packet.height);
-                self.now++;
-                if(self.now >= self.len) {
+                if(++self.now >= self.len) {
                     console.log("FINISH");
                     self.doc.save(self.name);
                     self.postMessage("finish");
                 }
-                console.log(self.now +", " + self.len);
                 break;
             }
         }
