@@ -166,11 +166,13 @@ document.getElementsByClassName("transform")[0].onclick = () => {
     const downloadPage = createLoadingPage("PDF를 생성중입니다.");
     document.body.appendChild(downloadPage);
 
+    const imageBoxList = document.getElementsByClassName("imageBox");
+
     setTimeout(() => {
         try {
-            for(let i = 0; i < document.getElementsByClassName("imageBox").length; i++) {
-                const item = document.getElementsByClassName("imageBox")[i];
-                const img = item.getElementsByClassName("imageContainer")[0].getElementsByTagName("img")[0];
+            for(let i = 0; i < imageBoxList.length; i++) {
+                const item = imageBoxList[i];
+                const img = item.getElementsByTagName("img")[0];
                 const width = img.naturalWidth * multiple;
                 const height = img.naturalHeight * multiple;
                 
@@ -181,7 +183,7 @@ document.getElementsByClassName("transform")[0].onclick = () => {
                 if(format == "auto") {
                     doc.setPageWidth(i + 1, width);
                     doc.setPageHeight(i + 1, height);
-                    doc.addImage(src, "JPEG", 0, 0, doc.getPageWidth(i + 1), doc.getPageHeight(i + 1));
+                    doc.addImage(src, "JPEG", 0, 0);
                 }else {
                     const persentage = ((doc.getPageWidth(i + 1)/width > doc.getPageHeight(i + 1)/height) ?
                             doc.getPageHeight(i + 1)/height :
@@ -190,11 +192,11 @@ document.getElementsByClassName("transform")[0].onclick = () => {
                     const subHeight = (doc.getPageHeight(i + 1) - height * persentage)/2;
                     doc.addImage(src, "JPEG", subWidth, subHeight, doc.getPageWidth(i + 1) - subWidth, doc.getPageHeight(i + 1) - subHeight);
                 }
-                if(i < document.getElementsByClassName("imageBox").length - 1)
+                if(i < imageBoxList.length - 1)
                     doc.addPage();
             }
 
-            doc.save(`${document.getElementsByClassName("imageBox")[0].getElementsByClassName("imageName")[0].innerText}.pdf`);
+            doc.save(`${imageBoxList[0].getElementsByClassName("imageName")[0].innerText}.pdf`);
         }catch(e) { console.log(e); }
         downloadPage.remove();
     });
@@ -332,28 +334,24 @@ const dataURLToBlob = url => {
 
 const imgCompress = image => {
     let result = image.src;
-    let checked = false;
-    if(!!document.createElement("canvas").getContext && !checked) {
-        checked = true;
-        setTimeout(() => {
-            try {
-                const canvas = document.createElement("canvas");
-                const width = image.naturalWidth * 0.7;
-                const height = image.naturalHeight * 0.7;
-                canvas.width = width;
-                canvas.height = height;
-                canvas.getContext("2d").drawImage(image, 0, 0, width, height);
-                result = canvas.toDataURL("image/jpeg", (() => {
-                    switch(document.getElementsByClassName("pdfOptionCompress")[0].value) {
-                        case 1: return 0.9;
-                        case 2: return 0.75;
-                        case 3: return 0.6;
-                        default: return 1;
-                    }
-                })());
-                // result = URL.createObjectURL(dataURLToBlob(dataUrl));
-            }catch(e) { }
-        });
+    if(!!document.createElement("canvas").getContext) {
+        try {
+            const canvas = document.createElement("canvas");
+            const width = image.naturalWidth;
+            const height = image.naturalHeight;
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext("2d").drawImage(image, 0, 0, width, height);
+            result = canvas.toDataURL("image/jpeg", (() => {
+                switch(parseInt(document.getElementsByClassName("pdfOptionCompress")[0].value)) {
+                    case 1: return 0.9;
+                    case 2: return 0.75;
+                    case 3: return 0.6;
+                    default: return 1;
+                }
+            })());
+            // result = URL.createObjectURL(dataURLToBlob(dataUrl));
+        }catch(e) { }
     }
     return result;
 }
