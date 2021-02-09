@@ -176,41 +176,43 @@ const imageListPDF = (downloadPage, orientation, util, format, multiple, imageLi
 
 const imageListPDFByThread = (downloadPage, orientation, util, format, multiple, imageList, compress) => {
     return new Promise(() => {
-        const worker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})));
-        const packet = {
-            url: URL.createObjectURL(new Blob(["("+jspdf_worker.toString()+")()"], {type: 'text/javascript'})),
-            font: malgun,
-            orientation: orientation,
-            util: util,
-            format: format,
-            type: "start"
-        }
-
-        worker.addEventListener("message", e => {
-            const link = document.createElement("a");
-            link.href = e.data;
-            link.download = `${imageList[0].getElementsByClassName("imageName")[0].innerText}.pdf`;
-            link.click();
-            downloadPage.remove();
-            worker.terminate();
-        });
-        worker.postMessage(packet);
-
-        
-        for(let i = 0; i < imageList.length; i++) {
-            const img = imageList[i].getElementsByTagName("img")[0];
-
-            const data = {
-                page: i + 1,
-                src: getImageSrc(img, compress),
-                width: img.naturalWidth * multiple,
-                height: img.naturalHeight * multiple,
+        setTimeout(() => {
+            const worker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})));
+            const packet = {
+                url: URL.createObjectURL(new Blob(["("+jspdf_worker.toString()+")()"], {type: 'text/javascript'})),
+                font: malgun,
+                orientation: orientation,
+                util: util,
                 format: format,
-                max: imageList.length,
-                type: "image"
+                type: "start"
             }
 
-            worker.postMessage(data);
-        }
+            worker.addEventListener("message", e => {
+                const link = document.createElement("a");
+                link.href = e.data;
+                link.download = `${imageList[0].getElementsByClassName("imageName")[0].innerText}.pdf`;
+                link.click();
+                downloadPage.remove();
+                worker.terminate();
+            });
+            worker.postMessage(packet);
+
+            
+            for(let i = 0; i < imageList.length; i++) {
+                const img = imageList[i].getElementsByTagName("img")[0];
+
+                const data = {
+                    page: i + 1,
+                    src: getImageSrc(img, compress),
+                    width: img.naturalWidth * multiple,
+                    height: img.naturalHeight * multiple,
+                    format: format,
+                    max: imageList.length,
+                    type: "image"
+                }
+
+                worker.postMessage(data);
+            }
+        });
     });
 }
