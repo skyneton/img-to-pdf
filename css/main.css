@@ -12,7 +12,7 @@ body {
 }
 
 .downloadLoadingPage {
-    cursor: wait;
+    cursor: context-menu;
     position: fixed;
     left: 0;
     right: 0;
