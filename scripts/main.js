@@ -173,24 +173,24 @@ document.getElementsByClassName("transform")[0].onclick = () => {
                 const img = item.getElementsByClassName("imageContainer")[0].getElementsByTagName("img")[0];
                 const width = img.naturalWidth * multiple;
                 const height = img.naturalHeight * multiple;
+                
+                let src = img.src;
+                if(document.getElementsByClassName("pdfOptionCompress")[0].value != 0)
+                    src = imgCompress(image.src);
+                if(document.getElementsByClassName("imgCompress")[0].checked && img.compressSrc)
+                    src = img.compressSrc;
+                
                 if(format == "auto") {
                     doc.setPageWidth(i + 1, width);
                     doc.setPageHeight(i + 1, height);
-                    doc.addImage(img.src, "JPEG", 0, 0, doc.getPageWidth(i + 1), doc.getPageHeight(i + 1));
+                    doc.addImage(src, "JPEG", 0, 0, doc.getPageWidth(i + 1), doc.getPageHeight(i + 1));
                 }else {
-                    const persentage = (() => {
-                        if(width > doc.getPageWidth(i + 1) || height > doc.getPageHeight(i + 1))
-                            return ((doc.getPageWidth(i + 1)/width > doc.getPageHeight(i + 1)/height) ?
-                                doc.getPageHeight(i + 1)/height :
-                                doc.getPageWidth(i + 1)/width);
-
-                        return ((doc.getPageWidth(i + 1)/width > doc.getPageHeight(i + 1)/height) ?
+                    const persentage = ((doc.getPageWidth(i + 1)/width > doc.getPageHeight(i + 1)/height) ?
                             doc.getPageHeight(i + 1)/height :
                             doc.getPageWidth(i + 1)/width);
-                    })();
                     const subWidth = (doc.getPageWidth(i + 1) - width * persentage)/2;
                     const subHeight = (doc.getPageHeight(i + 1) - height * persentage)/2;
-                    doc.addImage(img.src, "JPEG", subWidth / 2, subHeight / 2, doc.getPageWidth(i + 1) - subWidth, doc.getPageHeight(i + 1) - subHeight);
+                    doc.addImage(src, "JPEG", subWidth, subHeight, doc.getPageWidth(i + 1) - subWidth, doc.getPageHeight(i + 1) - subHeight);
                 }
                 if(i < document.getElementsByClassName("imageBox").length - 1)
                     doc.addPage();
@@ -225,27 +225,7 @@ const imageFileAdd = file => {
     canvas.setAttribute("class", "imageCanvas");
 
     const image = document.createElement("img");
-    if(document.getElementsByClassName("imgCompress")[0].checked) {
-        let checked = false;
-        image.onload = () => {
-            if(!!document.createElement("canvas").getContext && !checked) {
-                checked = true;
-                setTimeout(() => {
-                    try {
-                        const canvas = document.createElement("canvas");
-                        const width = image.naturalWidth * 0.8;
-                        const height = image.naturalHeight * 0.8;
-                        canvas.width = width;
-                        canvas.height = height;
-                        canvas.getContext("2d").drawImage(image, 0, 0, width, height);
-                        const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
-                        image.src = URL.createObjectURL(dataURLToBlob(dataUrl));
-                    }catch(e) { }
-                });
-            }
-        }
-    }
-
+    let checked = false;
     image.src = URL.createObjectURL(file);
     image.setAttribute("draggable", false);
 
@@ -351,4 +331,30 @@ const dataURLToBlob = url => {
     }
 
     return new Blob([uInt8Array], { type: contentType });
+}
+
+const imgCompress = image => {
+    let result = image.src;
+    if(!!document.createElement("canvas").getContext && !checked) {
+        checked = true;
+        setTimeout(() => {
+            try {
+                const canvas = document.createElement("canvas");
+                const width = image.naturalWidth * 0.7;
+                const height = image.naturalHeight * 0.7;
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext("2d").drawImage(image, 0, 0, width, height);
+                const dataUrl = canvas.toDataURL("image/jpeg", (() => {
+                    switch(document.getElementsByClassName("pdfOptionCompress")[0].value) {
+                        case 1: return 0.9;
+                        case 2: return 0.75;
+                        case 3: return 0.6;
+                        default: return 1;
+                    }
+                })());
+                result = URL.createObjectURL(dataURLToBlob(dataUrl));
+            }catch(e) { }
+        });
+    }
 }
