@@ -176,7 +176,7 @@ document.getElementsByClassName("transform")[0].onclick = () => {
                 
                 let src = img.src;
                 if(document.getElementsByClassName("pdfOptionCompress")[0].value != 0)
-                    src = imgCompress(image.src);
+                    src = imgCompress(image);
                 if(document.getElementsByClassName("imgCompress")[0].checked && img.compressSrc)
                     src = img.compressSrc;
                 
