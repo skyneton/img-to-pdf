@@ -168,37 +168,58 @@ document.getElementsByClassName("transform")[0].onclick = () => {
 
     const imageBoxList = document.getElementsByClassName("imageBox");
 
-    setTimeout(() => {
-        try {
+    try {
+        async () => {
+            const finished = new function() {
+                let finished = 0;
+                this.add = () => { return ++finished; }
+                this.get = () => { return finished; }
+            };
             for(let i = 0; i < imageBoxList.length; i++) {
-                const item = imageBoxList[i];
-                const img = item.getElementsByTagName("img")[0];
-                const width = img.naturalWidth * multiple;
-                const height = img.naturalHeight * multiple;
-                
-                let src = img.src;
-                if(document.getElementsByClassName("pdfOptionCompress")[0].value != 0)
-                    src = imgCompress(img);
-                
-                if(format == "auto") {
-                    doc.setPageWidth(i + 1, width);
-                    doc.setPageHeight(i + 1, height);
-                    doc.addImage(src, "JPEG", 0, 0);
-                }else {
-                    const persentage = ((doc.getPageWidth(i + 1)/width > doc.getPageHeight(i + 1)/height) ?
-                            doc.getPageHeight(i + 1)/height :
-                            doc.getPageWidth(i + 1)/width);
-                    const subWidth = (doc.getPageWidth(i + 1) - width * persentage)/2;
-                    const subHeight = (doc.getPageHeight(i + 1) - height * persentage)/2;
-                    doc.addImage(src, "JPEG", subWidth, subHeight, doc.getPageWidth(i + 1) - subWidth, doc.getPageHeight(i + 1) - subHeight);
-                }
-                if(i < imageBoxList.length - 1)
+                if(i > 0)
                     doc.addPage();
+                
+                await addImage(multiple, doc, i + 1, format, downloadPage, finished, imageBoxList);
+            }
+        }
+    }catch {
+        downloadPage.remove();
+    }
+}
+
+const addImage = (multiple, doc, page, format, downloadPage, finished, imageBoxList) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const item = imageBoxList[page - 1];
+            const img = item.getElementsByTagName("img")[0];
+            const width = img.naturalWidth * multiple;
+            const height = img.naturalHeight * multiple;
+                        
+            let src = img.src;
+            if(document.getElementsByClassName("pdfOptionCompress")[0].value != 0)
+                src = imgCompress(img);
+            try {
+                doc.setPage(page);
+                if(format == "auto") {
+                    doc.setPageWidth(page, width);
+                    doc.setPageHeight(page, height);
+                    doc.addImage(src, "JPEG", 0, 0, width, height);
+                }else {
+                    const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ?
+                            doc.getPageHeight(page)/height :
+                            doc.getPageWidth(page)/width);
+                    const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
+                    const subHeight = (doc.getPageHeight(page) - height * persentage)/2;
+                    doc.addImage(src, "JPEG", subWidth, subHeight, doc.getPageWidth(page) - subWidth, doc.getPageHeight(page) - subHeight);
+                }
+            }catch {}
+            if(finished.add() >= imageBoxList.length) {
+                downloadPage.remove();
+                doc.save(`${imageBoxList[0].getElementsByClassName("imageName")[0].innerText}.pdf`);
             }
 
-            doc.save(`${imageBoxList[0].getElementsByClassName("imageName")[0].innerText}.pdf`);
-        }catch(e) { console.log(e); }
-        downloadPage.remove();
+            resolve("finish");
+        });
     });
 }
 
@@ -342,7 +363,7 @@ const imgCompress = image => {
             canvas.width = width;
             canvas.height = height;
             canvas.getContext("2d").drawImage(image, 0, 0, width, height);
-            result = canvas.toDataURL("image/jpeg", (() => {
+            const dataUrl = canvas.toDataURL("image/jpeg", (() => {
                 switch(parseInt(document.getElementsByClassName("pdfOptionCompress")[0].value)) {
                     case 1: return 0.9;
                     case 2: return 0.75;
@@ -350,7 +371,7 @@ const imgCompress = image => {
                     default: return 1;
                 }
             })());
-            // result = URL.createObjectURL(dataURLToBlob(dataUrl));
+            result = URL.createObjectURL(dataURLToBlob(dataUrl));
         }catch(e) { }
     }
     return result;
