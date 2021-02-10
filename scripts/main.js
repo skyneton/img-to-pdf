@@ -163,7 +163,7 @@ document.getElementsByClassName("transform")[0].onclick = () => {
     const compress = document.getElementsByClassName("pdfOptionCompress")[0].value;
 
     setTimeout(() => {
-        if(location.protocol.startsWith("http")) {
+        if(location.protocol.startsWith("http") && !!Worker) {
             imageListPDFByThread(downloadPage, orientation, util, format, multiple, imageList, compress).catch((e) => {
                 console.error(e);
                 downloadPage.remove();
