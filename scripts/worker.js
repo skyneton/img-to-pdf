@@ -206,7 +206,7 @@ const imageListPDF = (downloadPage, orientation, util, format, multiple, imageLi
     return new Promise(() => {
         setTimeout(() => {
             const doc = PDFCreate(orientation, util, format);
-            const name = `${imageList[0].getElementsByClassName("imageName")[0].innerText}.pdf`;
+            const name = `${imageList[0].getElementsByClassName("imageName")[0].innerText.substring(imageList[0].getElementsByClassName("imageName")[0].innerText.lastIndexOf("."), 0)}.pdf`;
             const compressPercent = (() => {
                 switch(parseInt(compress)) {
                     case 1: return 0.9;
@@ -260,7 +260,7 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
             worker.addEventListener("message", e => {
                 const link = document.createElement("a");
                 link.href = e.data;
-                link.download = `${imageList[0].getElementsByClassName("imageName")[0].innerText}.pdf`;
+                link.download = `${imageList[0].getElementsByClassName("imageName")[0].innerText.substring(imageList[0].getElementsByClassName("imageName")[0].innerText.lastIndexOf("."), 0)}.pdf`;
                 link.click();
                 downloadPage.remove();
                 worker.terminate();
