@@ -36,7 +36,12 @@ const worker_function = () => {
             }
             case "image": {
                 if(packet.page > 1) doc.addPage();
-                addImage(packet.page, packet.src, packet.width, packet.height, packet.format);
+                if(packet.compress != 1) {
+                    imgCompress(packet.src, packet.compress).then(src => {
+                        addImage(packet.page, src, packet.width, packet.height, packet.format);
+                    });
+                }else
+                    addImage(packet.page, packet.src, packet.width, packet.height, packet.format);
 
                 if(index.add() >= packet.max) {
                     self.postMessage(URL.createObjectURL(doc.output("blob")));
@@ -60,6 +65,19 @@ const worker_function = () => {
         // doc.setFont("malgun");
     
         return doc;
+    }
+
+    const imgCompress = (url, compress) => {
+        return new Promise(resolve => {
+            fetch(url).then(r => r.blob()).then(blob => {
+                new Compressor(blob, {
+                    quality: compress,
+                    success(result) {
+                        resolve(URL.createObjectURL(result));
+                    },
+                });
+            });
+        });
     }
 }
 const addImage = (doc, page, src, width, height, format, name, index, max, loadingPage) => {
@@ -209,19 +227,18 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
             for(let i = 0; i < imageList.length; i++) {
                 const img = imageList[i].getElementsByTagName("img")[0];
 
-                getImageSrc(img.src, compress, compressPercent).then(result => {
-                    const data = {
-                        page: i + 1,
-                        src: result,
-                        width: img.naturalWidth * multiple,
-                        height: img.naturalHeight * multiple,
-                        format: format,
-                        max: imageList.length,
-                        type: "image"
-                    }
-                    
-                    worker.postMessage(data);
-                });
+                const data = {
+                    page: i + 1,
+                    src: img.src,
+                    width: img.naturalWidth * multiple,
+                    height: img.naturalHeight * multiple,
+                    format: format,
+                    max: imageList.length,
+                    compress: compressPercent,
+                    type: "image"
+                }
+                
+                worker.postMessage(data);
             }
         });
     });
