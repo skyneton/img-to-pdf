@@ -102,7 +102,7 @@ const worker_function = () => {
             const reader = new FileReader();
             reader.readAsArrayBuffer(blob);
             reader.onloadend = () => {
-                resolve(ImageData(new Uint8ClampedArray(reader.result), width, height));
+                resolve(new ImageData(new Uint8ClampedArray(reader.result), width, height));
             }
         });
     }
