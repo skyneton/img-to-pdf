@@ -130,8 +130,10 @@ window.onmouseup = () => {
 }
 
 document.getElementsByClassName("clear")[0].onclick = () => {
-    while(document.getElementsByClassName("imageBox").length > 0)
+    while(document.getElementsByClassName("imageBox").length > 0) {
+        URL.revokeObjectURL(document.getElementsByClassName("imageBox")[0].getElementsByTagName("img")[0].src);
         document.getElementsByClassName("imageBox")[0].remove();
+    }
 }
 
 document.getElementsByClassName("transform")[0].onclick = () => {
@@ -259,6 +261,7 @@ const imageFileAdd = file => {
     }
 
     deleteBtn.onclick = () => {
+        URL.revokeObjectURL(image.src);
         imageDivBox.remove();
     }
 }
