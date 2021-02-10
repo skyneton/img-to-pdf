@@ -5,19 +5,25 @@ const worker_function = () => {
     let doc;
 
     const addImage = (page, src, width, height, format) => {
-		try {
-        doc.setPage(page);
-        if(format == "auto") {
-            doc.setPageWidth(page, width);
-            doc.setPageHeight(page, height);
-            doc.addImage(src, "JPEG", 0, 0, width, height);
-        }else {
-            const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? self.doc.getPageHeight(page)/height : self.doc.getPageWidth(page)/width);
-            const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
-            const subHeight = (doc.getPageHeight(page) - height * persentage)/2;
-            doc.addImage(src, "JPEG", subWidth, subHeight, doc.getPageWidth(page) - subWidth, doc.getPageHeight(page) - subHeight);
-        }
-		}catch(e) { console.log(e); }
+        setTimeout(() => {
+            try {
+                doc.setPage(page);
+                if(format == "auto") {
+                    doc.setPageWidth(page, width);
+                    doc.setPageHeight(page, height);
+                    doc.addImage(src, "JPEG", 0, 0, width, height);
+                }else {
+                    const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? self.doc.getPageHeight(page)/height : self.doc.getPageWidth(page)/width);
+                    const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
+                    const subHeight = (doc.getPageHeight(page) - height * persentage)/2;
+                    doc.addImage(src, "JPEG", subWidth, subHeight, doc.getPageWidth(page) - subWidth, doc.getPageHeight(page) - subHeight);
+                }
+            }catch(e) { console.log(e); }
+
+            if(index.add() >= packet.max) {
+                self.postMessage(URL.createObjectURL(doc.output("blob")));
+            }
+        });
     }
     
     const index = new function() {
@@ -38,7 +44,6 @@ const worker_function = () => {
             case "image": {
                 if(packet.page > 1) doc.addPage();
                 if(packet.compress != 1) {
-                    console.log("COM");
                     imgCompress(packet.src, packet.compress).then(src => {
                         console.log("ASDF");
                         console.log(src);
@@ -46,10 +51,6 @@ const worker_function = () => {
                     });
                 }else
                     addImage(packet.page, packet.src, packet.width, packet.height, packet.format);
-
-                if(index.add() >= packet.max) {
-                    self.postMessage(URL.createObjectURL(doc.output("blob")));
-                }
                 break;
             }
         }
