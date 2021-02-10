@@ -37,7 +37,6 @@ const worker_function = () => {
             }
             case "image": {
                 if(packet.page > 1) doc.addPage();
-                console.log(packet.compress);
                 if(packet.compress != 1) {
                     console.log("COM");
                     imgCompress(packet.src, packet.compress).then(src => {
@@ -171,7 +170,7 @@ const imageListPDF = (downloadPage, orientation, util, format, multiple, imageLi
             const doc = PDFCreate(orientation, util, format);
             const name = `${imageList[0].getElementsByClassName("imageName")[0].innerText}.pdf`;
             const compressPercent = (() => {
-                switch(compress) {
+                switch(parseInt(compress)) {
                     case 1: return 0.9;
                     case 2: return 0.75;
                     case 3: return 0.6;
@@ -201,7 +200,7 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
         setTimeout(() => {
             const worker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})));
             const compressPercent = (() => {
-                switch(compress) {
+                switch(parseInt(compress)) {
                     case 1: return 0.9;
                     case 2: return 0.75;
                     case 3: return 0.6;
