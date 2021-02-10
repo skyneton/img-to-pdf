@@ -37,6 +37,7 @@ const worker_function = () => {
             }
             case "image": {
                 if(packet.page > 1) doc.addPage();
+                console.log(packet.compress);
                 if(packet.compress != 1) {
                     console.log("COM");
                     imgCompress(packet.src, packet.compress).then(src => {
