@@ -4,7 +4,7 @@ const worker_function = () => {
 
     let doc;
 
-    const addImage = (page, src, width, height, format) => {
+    const addImage = (page, src, width, height, format, max) => {
         setTimeout(() => {
             try {
                 doc.setPage(page);
@@ -20,7 +20,7 @@ const worker_function = () => {
                 }
             }catch(e) { console.log(e); }
 
-            if(index.add() >= packet.max) {
+            if(index.add() >= max) {
                 self.postMessage(URL.createObjectURL(doc.output("blob")));
             }
         });
@@ -47,10 +47,10 @@ const worker_function = () => {
                     imgCompress(packet.src, packet.compress).then(src => {
                         console.log("ASDF");
                         console.log(src);
-                        addImage(packet.page, src, packet.width, packet.height, packet.format);
+                        addImage(packet.page, src, packet.width, packet.height, packet.format, packet.max);
                     });
                 }else
-                    addImage(packet.page, packet.src, packet.width, packet.height, packet.format);
+                    addImage(packet.page, packet.src, packet.width, packet.height, packet.format, packet.max);
                 break;
             }
         }
