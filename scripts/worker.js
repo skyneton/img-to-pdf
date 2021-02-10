@@ -105,8 +105,7 @@ const imgCompress = (url, compress) => {
             new Compressor(blob, {
                 quality: compress,
                 success(result) {
-                    console.log(result);
-                    resolve(result);
+                    resolve(URL.createObjectURL(result));
                 },
             });
         });
