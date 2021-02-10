@@ -4,7 +4,7 @@ const worker_function = () => {
 
     let doc;
 
-    const addImage = (page, src, width, height, format, max) => {
+    const addImage = (page, src, width, height, format, max, revoke = false) => {
         setTimeout(() => {
             try {
                 doc.setPage(page);
@@ -20,10 +20,28 @@ const worker_function = () => {
                 }
             }catch(e) { console.log(e); }
 
+            if(revoke) URL.revokeObjectURL(src);
+
             if(index.add() >= max) {
+                compress.stop();
                 self.postMessage(URL.createObjectURL(doc.output("blob")));
             }
         });
+    }
+
+    const compress = new function() {
+        let a;
+        this.set = (t) => {
+            this.stop();
+            a = t;
+        }
+        this.get = () => {
+            return a;
+        }
+
+        this.stop = () => {
+            a.terminate();
+        }
     }
     
     const index = new function() {
@@ -32,22 +50,28 @@ const worker_function = () => {
         this.add = () => { return ++i; }
     };
 
-    self.addEventListener("message", (data) => {
+    self.addEventListener("message", data => {
         const packet = data.data;
         switch(packet.type) {
             case "start": {
                 importScripts(packet.url);
-                importScripts(packet.compressWorker);
                 doc = PDFCreate(packet.orientation, packet.util, packet.format);
+                compress.set(new Worker(packet.compressWorker));
+                compress.get().addEventListener("message", e => {
+                    const receive = e.data;
+                    addImage(receive.return.page, URL.createObjectURL(new Blob([receive.original.data], {type: "image/jpeg"})), receive.original.width, receive.original.height, receive.return.format, receive.return.max, true);
+                });
                 break;
             }
             case "image": {
                 if(packet.page > 1) doc.addPage();
                 if(packet.compress != 1) {
-                    imgCompress(packet.src, packet.compress).then(src => {
-                        console.log("ASDF");
-                        console.log(src);
-                        addImage(packet.page, src, packet.width, packet.height, packet.format, packet.max);
+                    getImageData(packet.src, packet.naturalWidth, packet.naturalHeight).then(imageData => {
+                        compress.get().postMessage({
+                            image: imageData,
+                            quality: Math.floor(packet.compress * 100),
+                            return: packet
+                        });
                     });
                 }else
                     addImage(packet.page, packet.src, packet.width, packet.height, packet.format, packet.max);
@@ -70,6 +94,17 @@ const worker_function = () => {
         // doc.setFont("malgun");
     
         return doc;
+    }
+
+    const getImageData = (url, width, height) => {
+        new Promise(async resolve => {
+            const blob = await fetch(url).then(r => r.blob());
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(blob);
+            reader.onloadend = () => {
+                resolve(ImageData(new Uint8ClampedArray(reader.result), width, height));
+            }
+        });
     }
 
     const imgCompress = (url, compress) => {
@@ -201,7 +236,10 @@ const imageListPDF = (downloadPage, orientation, util, format, multiple, imageLi
 const imageListPDFByThread = (downloadPage, orientation, util, format, multiple, imageList, compress) => {
     return new Promise(() => {
         setTimeout(() => {
-            const worker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})));
+            const workerURL = URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'}));
+            const jspdfURL = URL.createObjectURL(new Blob(["("+jspdf_worker.toString()+")()"], {type: 'text/javascript'}));
+            const jpegURL = URL.createObjectURL(new Blob(["("+jpeg_worker.toString()+")()"], {type: 'text/javascript'}));
+            const worker = new Worker(workerURL);
             const compressPercent = (() => {
                 switch(parseInt(compress)) {
                     case 1: return 0.9;
@@ -211,8 +249,8 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
                 }
             })();
             const packet = {
-                url: URL.createObjectURL(new Blob(["("+jspdf_worker.toString()+")()"], {type: 'text/javascript'})),
-                compressWorker: URL.createObjectURL(new Blob(["("+compress_worker.toString()+")()"], {type: 'text/javascript'})),
+                url: jspdfURL,
+                compressWorker: jpegURL,
                 orientation: orientation,
                 util: util,
                 format: format,
@@ -226,6 +264,9 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
                 link.click();
                 downloadPage.remove();
                 worker.terminate();
+                URL.revokeObjectURL(workerURL);
+                URL.revokeObjectURL(jspdfURL);
+                URL.revokeObjectURL(jpegURL);
             });
             worker.postMessage(packet);
 
@@ -238,6 +279,8 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
                     src: img.src,
                     width: img.naturalWidth * multiple,
                     height: img.naturalHeight * multiple,
+                    naturalWidth: img.naturalWidth,
+                    naturalHeight: img.naturalHeight,
                     format: format,
                     max: imageList.length,
                     compress: compressPercent,
