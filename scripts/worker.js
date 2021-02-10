@@ -31,7 +31,7 @@ const worker_function = () => {
         switch(packet.type) {
             case "start": {
                 importScripts(packet.url);
-                doc = PDFCreate(packet.orientation, packet.util, packet.format, packet.font);
+                doc = PDFCreate(packet.orientation, packet.util, packet.format);
                 break;
             }
             case "image": {
@@ -46,7 +46,7 @@ const worker_function = () => {
         }
     });
 
-    const PDFCreate = (orientation, util, format, font) => {
+    const PDFCreate = (orientation, util, format) => {
         const doc = new jspdf.jsPDF({
             orientation: orientation,
             unit: util,
@@ -55,9 +55,9 @@ const worker_function = () => {
                 return format;
             })()
         });
-        doc.addFileToVFS("malgun.ttf", font);
-        doc.addFont("malgun.ttf", "malgun", "normal");
-        doc.setFont("malgun");
+        // doc.addFileToVFS("malgun.ttf", font);
+        // doc.addFont("malgun.ttf", "malgun", "normal");
+        // doc.setFont("malgun");
     
         return doc;
     }
@@ -93,9 +93,9 @@ const PDFCreate = (orientation, util, format) => {
             return format;
         })()
     });
-    doc.addFileToVFS("malgun.ttf", malgun);
-    doc.addFont("malgun.ttf", "malgun", "normal");
-    doc.setFont("malgun");
+    // doc.addFileToVFS("malgun.ttf", malgun);
+    // doc.addFont("malgun.ttf", "malgun", "normal");
+    // doc.setFont("malgun");
 
     return doc;
 }
@@ -190,7 +190,6 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
             })();
             const packet = {
                 url: URL.createObjectURL(new Blob(["("+jspdf_worker.toString()+")()"], {type: 'text/javascript'})),
-                font: malgun,
                 orientation: orientation,
                 util: util,
                 format: format,
