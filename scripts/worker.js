@@ -106,19 +106,6 @@ const worker_function = () => {
             }
         });
     }
-
-    const imgCompress = (url, compress) => {
-        return new Promise(resolve => {
-            fetch(url).then(r => r.blob()).then(blob => {
-                new Compressor(blob, {
-                    quality: compress,
-                    success(result) {
-                        resolve(URL.createObjectURL(result));
-                    },
-                });
-            });
-        });
-    }
 }
 const addImage = (doc, page, src, width, height, format, name, index, max, loadingPage) => {
     setTimeout(() => {
