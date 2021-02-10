@@ -38,7 +38,9 @@ const worker_function = () => {
             case "image": {
                 if(packet.page > 1) doc.addPage();
                 if(packet.compress != 1) {
+                    console.log("COM");
                     imgCompress(packet.src, packet.compress).then(src => {
+                        console.log("ASDF");
                         console.log(src);
                         addImage(packet.page, src, packet.width, packet.height, packet.format);
                     });
