@@ -99,34 +99,27 @@ const PDFCreate = (orientation, util, format) => {
 
     return doc;
 }
-const imgCompress = image => {
-    let result = image.src;
-    if(!!document.createElement("canvas").getContext) {
-        try {
-            const canvas = document.createElement("canvas");
-            const width = image.naturalWidth;
-            const height = image.naturalHeight;
-            canvas.width = width;
-            canvas.height = height;
-            canvas.getContext("2d").drawImage(image, 0, 0, width, height);
-            const dataUrl = canvas.toDataURL("image/jpeg", (() => {
-                switch(parseInt(document.getElementsByClassName("pdfOptionCompress")[0].value)) {
-                    case 1: return 0.9;
-                    case 2: return 0.75;
-                    case 3: return 0.6;
-                    default: return 1;
-                }
-            })());
-            result = URL.createObjectURL(dataURLToBlob(dataUrl));
-        }catch(e) { }
-    }
-    return result;
+const imgCompress = (url, compress) => {
+    return new Promise(resolve => {
+        fetch(url).then(r => r.blob()).then(blob => {
+            new Compressor(blob, {
+                quality: compress,
+                success(result) {
+                    console.log(result);
+                    resolve(result);
+                },
+            });
+        });
+    });
 }
 
-const getImageSrc = (img, compress) => {
-    if(compress == 0)
-        return img.src;
-    return imgCompress(img);
+const getImageSrc = (url, compress, percent) => {
+    return new Promise(resolve => {
+        if(compress == 0)
+            resolve(url);
+        else
+            imgCompress(url, percent).then(result => { resolve(result); });
+    });
 }
 
 const dataURLToBlob = url => {
@@ -157,6 +150,14 @@ const imageListPDF = (downloadPage, orientation, util, format, multiple, imageLi
         setTimeout(() => {
             const doc = PDFCreate(orientation, util, format);
             const name = `${imageList[0].getElementsByClassName("imageName")[0].innerText}.pdf`;
+            const compressPercent = (() => {
+                switch(compress) {
+                    case 1: return 0.9;
+                    case 2: return 0.75;
+                    case 3: return 0.6;
+                    default: return 1;
+                }
+            })();
 
             const index = new function() {
                 let i = 0;
@@ -167,8 +168,9 @@ const imageListPDF = (downloadPage, orientation, util, format, multiple, imageLi
             for(let i = 0; i < imageList.length; i++) {
                 if(i > 0) doc.addPage();
                 const img = imageList[i].getElementsByTagName("img")[0];
-    
-                addImage(doc, i + 1, getImageSrc(img, compress), img.naturalWidth * multiple, img.naturalHeight * multiple, format, name, index, imageList.length, downloadPage);
+                getImageSrc(img.src, compress, compressPercent).then(result => {
+                    addImage(doc, i + 1, result, img.naturalWidth * multiple, img.naturalHeight * multiple, format, name, index, imageList.length, downloadPage);
+                });
             }
         }, 700);
     });
@@ -178,6 +180,14 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
     return new Promise(() => {
         setTimeout(() => {
             const worker = new Worker(URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'})));
+            const compressPercent = (() => {
+                switch(compress) {
+                    case 1: return 0.9;
+                    case 2: return 0.75;
+                    case 3: return 0.6;
+                    default: return 1;
+                }
+            })();
             const packet = {
                 url: URL.createObjectURL(new Blob(["("+jspdf_worker.toString()+")()"], {type: 'text/javascript'})),
                 font: malgun,
@@ -201,17 +211,19 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
             for(let i = 0; i < imageList.length; i++) {
                 const img = imageList[i].getElementsByTagName("img")[0];
 
-                const data = {
-                    page: i + 1,
-                    src: getImageSrc(img, compress),
-                    width: img.naturalWidth * multiple,
-                    height: img.naturalHeight * multiple,
-                    format: format,
-                    max: imageList.length,
-                    type: "image"
-                }
-
-                worker.postMessage(data);
+                getImageSrc(img.src, compress, compressPercent).then(result => {
+                    const data = {
+                        page: i + 1,
+                        src: result,
+                        width: img.naturalWidth * multiple,
+                        height: img.naturalHeight * multiple,
+                        format: format,
+                        max: imageList.length,
+                        type: "image"
+                    }
+                    
+                    worker.postMessage(data);
+                });
             }
         });
     });
