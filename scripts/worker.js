@@ -31,6 +31,7 @@ const worker_function = () => {
         switch(packet.type) {
             case "start": {
                 importScripts(packet.url);
+                importScripts(packet.compressWorker);
                 doc = PDFCreate(packet.orientation, packet.util, packet.format);
                 break;
             }
@@ -207,6 +208,7 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
             })();
             const packet = {
                 url: URL.createObjectURL(new Blob(["("+jspdf_worker.toString()+")()"], {type: 'text/javascript'})),
+                compressWorker: URL.createObjectURL(new Blob(["("+compress_worker.toString()+")()"], {type: 'text/javascript'})),
                 orientation: orientation,
                 util: util,
                 format: format,
