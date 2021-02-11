@@ -263,10 +263,10 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
             for(let i = 0; i < imageList.length; i++) {
                 const img = imageList[i].getElementsByTagName("img")[0];
 
-                getImageSrc(img.src, compress, compressPercent).then(src => {
+                getImageSrc(img.src, compress, compressPercent).then(url => {
                     const data = {
                         page: i + 1,
-                        src: src,
+                        src: url,
                         width: img.naturalWidth * multiple,
                         height: img.naturalHeight * multiple,
                         format: format,
