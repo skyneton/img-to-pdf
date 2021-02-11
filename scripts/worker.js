@@ -5,9 +5,9 @@ const worker_function = () => {
     let doc;
 
     const addImage = (page, src, width, height, format, max, revoke = false) => {
-        console.log(page, width, height);
         setTimeout(() => {
             try {
+                console.log(page, width, height);
                 doc.setPage(page);
                 if(format == "auto") {
                     doc.setPageWidth(page, width);
@@ -255,7 +255,6 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
                 worker.terminate();
                 URL.revokeObjectURL(workerURL);
                 URL.revokeObjectURL(jspdfURL);
-                URL.revokeObjectURL(jpegURL);
             });
             worker.postMessage(packet);
 
