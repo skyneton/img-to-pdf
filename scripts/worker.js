@@ -173,7 +173,7 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
             }
 
             worker.addEventListener("message", e => {
-                saveAs(a.data, `${imageList[0].getElementsByClassName("imageName")[0].innerText.substring(imageList[0].getElementsByClassName("imageName")[0].innerText.lastIndexOf("."), 0)}.pdf`);
+                saveAs(e.data, `${imageList[0].getElementsByClassName("imageName")[0].innerText.substring(imageList[0].getElementsByClassName("imageName")[0].innerText.lastIndexOf("."), 0)}.pdf`);
                 downloadPage.remove();
                 worker.terminate();
                 URL.revokeObjectURL(workerURL);
