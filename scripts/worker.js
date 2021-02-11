@@ -5,6 +5,7 @@ const worker_function = () => {
     let doc;
 
     const addImage = (page, src, width, height, format, max, revoke = false) => {
+        console.log(page, width, height);
         setTimeout(() => {
             try {
                 doc.setPage(page);
@@ -23,7 +24,6 @@ const worker_function = () => {
             if(revoke) URL.revokeObjectURL(src);
 
             if(index.add() >= max) {
-                compress.stop();
                 self.postMessage(URL.createObjectURL(doc.output("blob")));
             }
         });
