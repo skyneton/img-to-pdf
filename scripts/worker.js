@@ -152,55 +152,53 @@ const imageListPDF = (downloadPage, orientation, util, format, multiple, imageLi
 
 const imageListPDFByThread = (downloadPage, orientation, util, format, multiple, imageList, compress) => {
     return new Promise(() => {
-        setTimeout(() => {
-            const workerURL = URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'}));
-            const jspdfURL = URL.createObjectURL(new Blob(["("+jspdf_worker.toString()+")()"], {type: 'text/javascript'}));
-            const worker = new Worker(workerURL);
-            const quality = (() => {
-                switch(parseInt(compress)) {
-                    case 1: return 0.7;
-                    case 2: return 0.5;
-                    case 3: return 0.3;
-                    default: return 1;
+        const workerURL = URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'}));
+        const jspdfURL = URL.createObjectURL(new Blob(["("+jspdf_worker.toString()+")()"], {type: 'text/javascript'}));
+        const worker = new Worker(workerURL);
+        const quality = (() => {
+            switch(parseInt(compress)) {
+                case 1: return 0.7;
+                case 2: return 0.5;
+                case 3: return 0.3;
+                default: return 1;
+            }
+        })();
+        const packet = {
+            url: jspdfURL,
+            orientation: orientation,
+            util: util,
+            format: format,
+            type: "start"
+        }
+
+        worker.addEventListener("message", e => {
+            saveAs(e.data, `${imageList[0].getElementsByClassName("imageName")[0].innerText.substring(imageList[0].getElementsByClassName("imageName")[0].innerText.lastIndexOf("."), 0)}.pdf`);
+            downloadPage.remove();
+            worker.terminate();
+            URL.revokeObjectURL(workerURL);
+            URL.revokeObjectURL(jspdfURL);
+        });
+        worker.postMessage(packet);
+
+        
+        for(let i = 0; i < imageList.length; i++) {
+            const img = imageList[i].getElementsByTagName("img")[0];
+
+            getImageSrc(img.src, compress, quality).then(result => {
+                const data = {
+                    page: i + 1,
+                    src: result,
+                    width: img.naturalWidth * multiple,
+                    height: img.naturalHeight * multiple,
+                    format: format,
+                    max: imageList.length,
+                    revoke: compress != 0,
+                    type: "image"
                 }
-            })();
-            const packet = {
-                url: jspdfURL,
-                orientation: orientation,
-                util: util,
-                format: format,
-                type: "start"
-            }
-
-            worker.addEventListener("message", e => {
-                saveAs(e.data, `${imageList[0].getElementsByClassName("imageName")[0].innerText.substring(imageList[0].getElementsByClassName("imageName")[0].innerText.lastIndexOf("."), 0)}.pdf`);
-                downloadPage.remove();
-                worker.terminate();
-                URL.revokeObjectURL(workerURL);
-                URL.revokeObjectURL(jspdfURL);
+                
+                worker.postMessage(data);
             });
-            worker.postMessage(packet);
-
-            
-            for(let i = 0; i < imageList.length; i++) {
-                const img = imageList[i].getElementsByTagName("img")[0];
-
-                getImageSrc(img.src, compress, quality).then(result => {
-                    const data = {
-                        page: i + 1,
-                        src: result,
-                        width: img.naturalWidth * multiple,
-                        height: img.naturalHeight * multiple,
-                        format: format,
-                        max: imageList.length,
-                        revoke: compress != 0,
-                        type: "image"
-                    }
-                    
-                    worker.postMessage(data);
-                });
-            }
-        }, 700);
+        }
     });
 }
 
