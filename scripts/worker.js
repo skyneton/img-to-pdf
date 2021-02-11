@@ -79,9 +79,10 @@ const addImage = (doc, page, src, width, height, format, name, index, max, loadi
         if(revoke) URL.revokeObjectURL(src);
 
         if(index.add() >= max) {
-            doc.save(name, {returnPromise: true}).then(() => {
-                loadingPage.remove();
-            });
+            const url = URL.createObjectURL(doc.output("blob"));
+            saveAs(url, name);
+            URL.revokeObjectURL(url);
+            loadingPage.remove();
         }
     });
 }
@@ -98,15 +99,14 @@ const PDFCreate = (orientation, util, format) => {
 
     return doc;
 }
+
 const imageCompress = (url, quality) => {
     return new Promise(resolve => {
-        fetch(url).then(r => r.blob()).then(blob => {
-            new Compressor(blob, {
-                quality: quality,
-                success(result) {
-                    resolve(URL.createObjectURL(result));
-                },
-            });
+        new Compressor(url, {
+            quality: quality,
+            success(result) {
+                resolve(URL.createObjectURL(result));
+            },
         });
     });
 }
@@ -126,9 +126,9 @@ const imageListPDF = (downloadPage, orientation, util, format, multiple, imageLi
         const name = `${imageList[0].getElementsByClassName("imageName")[0].innerText.substring(imageList[0].getElementsByClassName("imageName")[0].innerText.lastIndexOf("."), 0)}.pdf`;
         const quality = (() => {
             switch(parseInt(compress)) {
-                case 1: return 0.7;
-                case 2: return 0.5;
-                case 3: return 0.3;
+                case 1: return 0.8;
+                case 2: return 0.65;
+                case 3: return 0.5;
                 default: return 1;
             }
         })();
@@ -139,12 +139,14 @@ const imageListPDF = (downloadPage, orientation, util, format, multiple, imageLi
             this.add = () => { return ++i; }
         };
 
+        compressTime = 0;
+
         for(let i = 0; i < imageList.length; i++) {
             while(doc.getNumberOfPages() < i + 1) doc.addPage();
             const img = imageList[i].getElementsByTagName("img")[0];
 
             getImageSrc(img.src, compress, quality).then(result => {
-                addImage(doc, i + 1, result, img.naturalWidth * multiple, img.naturalHeight * multiple, format, name, index, imageList.length, downloadPage);
+                addImage(doc, i + 1, result, img.naturalWidth * multiple, img.naturalHeight * multiple, format, name, index, imageList.length, downloadPage, compress != 0);
             });
         }
     });
@@ -157,9 +159,9 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
         const worker = new Worker(workerURL);
         const quality = (() => {
             switch(parseInt(compress)) {
-                case 1: return 0.7;
-                case 2: return 0.5;
-                case 3: return 0.3;
+                case 1: return 0.8;
+                case 2: return 0.65;
+                case 3: return 0.5;
                 default: return 1;
             }
         })();
@@ -204,6 +206,7 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
 
 const saveAs = (url, name) => {
     const link = document.createElement("a");
+    link.target = "_blank";
     link.href = url;
     link.download = name;
     link.click();
