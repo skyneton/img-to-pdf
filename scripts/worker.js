@@ -5,28 +5,26 @@ const worker_function = () => {
     let doc;
 
     const addImage = (page, src, width, height, format, max, revoke = false) => {
-        setTimeout(() => {
-            try {
-                console.log(page, width, height);
-                doc.setPage(page);
-                if(format == "auto") {
-                    doc.setPageWidth(page, 10);
-                    doc.setPageHeight(page, 10);
-                    doc.addImage(src, "JPEG", 0, 0, 10, 10);
-                }else {
-                    const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? self.doc.getPageHeight(page)/height : self.doc.getPageWidth(page)/width);
-                    const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
-                    const subHeight = (doc.getPageHeight(page) - height * persentage)/2;
-                    doc.addImage(src, "JPEG", subWidth, subHeight, doc.getPageWidth(page) - subWidth, doc.getPageHeight(page) - subHeight);
-                }
-            }catch(e) { console.log(e); }
-
-            if(revoke) URL.revokeObjectURL(src);
-
-            if(index.add() >= max) {
-                self.postMessage(URL.createObjectURL(doc.output("blob")));
+        try {
+            console.log(page, width, height);
+            doc.setPage(page);
+            if(format == "auto") {
+                doc.setPageWidth(page, 10);
+                doc.setPageHeight(page, 10);
+                doc.addImage(src, "JPEG", 0, 0, 10, 10);
+            }else {
+                const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? self.doc.getPageHeight(page)/height : self.doc.getPageWidth(page)/width);
+                const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
+                const subHeight = (doc.getPageHeight(page) - height * persentage)/2;
+                doc.addImage(src, "JPEG", subWidth, subHeight, doc.getPageWidth(page) - subWidth, doc.getPageHeight(page) - subHeight);
             }
-        });
+        }catch(e) { console.log(e); }
+
+        if(revoke) URL.revokeObjectURL(src);
+
+        if(index.add() >= max) {
+            self.postMessage(URL.createObjectURL(doc.output("blob")));
+        }
     }
     
     const index = new function() {
