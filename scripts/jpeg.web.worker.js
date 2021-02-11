@@ -1,9 +1,9 @@
 const jpeg_worker = () => {
 this.onmessage = function(e) {
   if (e.data.png) {
-    this.postMessage({original: UPNG.encode([e.data.image.data], e.data.image.width, e.data.image.height, 0), return: e.data.return });
+    this.postMessage({result: UPNG.encode([e.data.image.data], e.data.image.width, e.data.image.height, 0), return: e.data.return, code: e.data.code });
   } else {
-    this.postMessage({original: encode(e.data.image, e.data.quality, e.data.code), return: e.data.return });
+    this.postMessage({result: encode(e.data.image, e.data.quality), return: e.data.return, code: e.data.code });
   }
 };
 
