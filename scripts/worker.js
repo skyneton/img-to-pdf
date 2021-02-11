@@ -10,9 +10,9 @@ const worker_function = () => {
                 console.log(page, width, height);
                 doc.setPage(page);
                 if(format == "auto") {
-                    doc.setPageWidth(page, width);
-                    doc.setPageHeight(page, height);
-                    doc.addImage(src, "JPEG", 0, 0, width, height);
+                    doc.setPageWidth(page, 10);
+                    doc.setPageHeight(page, 10);
+                    doc.addImage(src, "JPEG", 0, 0, 10, 10);
                 }else {
                     const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? self.doc.getPageHeight(page)/height : self.doc.getPageWidth(page)/width);
                     const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
