@@ -28,21 +28,6 @@ const worker_function = () => {
             }
         });
     }
-
-    const compress = new function() {
-        let a;
-        this.set = (t) => {
-            this.stop();
-            a = t;
-        }
-        this.get = () => {
-            return a;
-        }
-
-        this.stop = () => {
-            a.terminate();
-        }
-    }
     
     const index = new function() {
         let i = 0;
@@ -56,11 +41,6 @@ const worker_function = () => {
             case "start": {
                 importScripts(packet.url);
                 doc = PDFCreate(packet.orientation, packet.util, packet.format);
-                compress.set(new Worker(packet.compressWorker));
-                compress.get().addEventListener("message", e => {
-                    const receive = e.data;
-                    addImage(receive.return.page, URL.createObjectURL(new Blob([receive.original.data], {type: "image/jpeg"})), receive.original.width, receive.original.height, receive.return.format, receive.return.max, true);
-                });
                 break;
             }
             case "image": {
