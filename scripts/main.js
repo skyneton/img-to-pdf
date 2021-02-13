@@ -3,21 +3,23 @@ let pdfBlockMove;
 const fileDragOverEvent = event => {
     event.stopPropagation();
     event.preventDefault();
-}
+};
 
 document.getElementsByClassName("fileAddBox")[0].onclick = () => {
+    if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     document.getElementsByClassName("inpFile")[0].click();
-}
+};
 
 window.ondragover = () => {
     if(pdfBlockMove) return;
     event.stopPropagation();
     event.preventDefault();
-}
+};
 
 window.ondrop = () => {
     event.stopPropagation();
     event.preventDefault();
+    if(document.getElementsByClassName("downloadLoadingPage").length > 0) return false;
     const files = (() => {
         if(document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type") == "up")
             return [...(event.target.files || event.dataTransfer.files)].sort((a, b) => {
@@ -33,9 +35,10 @@ window.ondrop = () => {
         imageFileAdd(files[i]);
     }
     pdfBlockMove = undefined;
-}
+};
 
 document.getElementsByClassName("inpFile")[0].onchange = () => {
+    if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     const files = (() => {
         if(document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type") == "up") {
             return [...(event.target.files || event.dataTransfer.files)].sort((a, b) => {
@@ -51,9 +54,10 @@ document.getElementsByClassName("inpFile")[0].onchange = () => {
     for(let i = 0; i < files.length; i++) {
         imageFileAdd(files[i]);
     }
-}
+};
 
 document.getElementsByClassName("orderByCommandBtn")[0].onclick = () => {
+    if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     const loc = document.getElementsByClassName("imageListBox")[0];
     const plusBtn = document.getElementsByClassName("fileAddBox")[0];
     const list = [...document.getElementsByClassName("imageBox")];
@@ -71,9 +75,10 @@ document.getElementsByClassName("orderByCommandBtn")[0].onclick = () => {
     })().forEach(item => {
         loc.insertBefore(item, plusBtn);
     });
-}
+};
 
 document.getElementsByClassName("pdfOptionFormat")[0].onchange = () => {
+    if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     if(event.target.value != "auto") {
         document.getElementsByClassName("pdfOptionOrientation")[0].disabled = false;
         document.getElementsByClassName("imageListBox")[0].setAttribute("format", (() => {
@@ -86,10 +91,11 @@ document.getElementsByClassName("pdfOptionFormat")[0].onchange = () => {
         if(document.getElementsByClassName("imageListBox")[0].hasAttribute("format"))
             document.getElementsByClassName("imageListBox")[0].removeAttribute("format");
     }
-}
+};
 
 
 document.getElementsByClassName("pdfOptionOrientation")[0].onchange = () => {
+    if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     if(document.getElementsByClassName("pdfOptionFormat")[0].value != "auto") {
         document.getElementsByClassName("imageListBox")[0].setAttribute("format", (() => {
             if(event.target.value == "landscape")
@@ -97,24 +103,26 @@ document.getElementsByClassName("pdfOptionOrientation")[0].onchange = () => {
             return "a";
         })());
     }
-}
+};
 
 document.getElementsByClassName("orderByTypeBtn")[0].onclick = () => {
+    if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     if(!document.getElementsByClassName("orderByTypeBtn")[0].time) {
         document.getElementsByClassName("orderByTypeBtn")[0].getElementsByTagName("svg")[0].getElementsByTagName("path")[0].setAttribute("d", "M13.3333 12L7.99992 6.5L2.66659 12L1.33325 10.6667L7.99992 4L14.6666 10.6667L13.3333 12Z");
         document.getElementsByClassName("orderByTypeBtn")[0].setAttribute("active", true);
     }
     document.getElementsByClassName("orderByTypeBtn")[0].time = undefined;
-}
+};
 
 document.getElementsByClassName("orderByOptionItem")[0].onclick = () => {
+    if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     const temp = document.getElementsByClassName("orderByCommandBtn")[0].innerText;
     document.getElementsByClassName("orderByCommandBtn")[0].innerText = document.getElementsByClassName("orderByOptionItem")[0].innerText;
     document.getElementsByClassName("orderByOptionItem")[0].innerText = temp;
     const dataTemp = document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type");
     document.getElementsByClassName("orderByCommandBtn")[0].setAttribute("data-type", document.getElementsByClassName("orderByOptionItem")[0].getAttribute("data-type"));
     document.getElementsByClassName("orderByOptionItem")[0].setAttribute("data-type", dataTemp);
-}
+};
 
 window.onmouseup = () => {
     if(document.getElementsByClassName("orderByTypeBtn")[0].hasAttribute("active")) {
@@ -130,16 +138,18 @@ window.onmouseup = () => {
         document.getElementsByClassName("orderByTypeBtn")[0].removeAttribute("active");
         document.getElementsByClassName("orderByTypeBtn")[0].getElementsByTagName("svg")[0].getElementsByTagName("path")[0].setAttribute("d", "M13.3333 4L14.6666 5.33333L7.99992 12L1.33325 5.33333L2.66659 4L7.99992 9.5L13.3333 4Z");
     }
-}
+};
 
 document.getElementsByClassName("clear")[0].onclick = () => {
+    if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     while(document.getElementsByClassName("imageBox").length > 0) {
         URL.revokeObjectURL(document.getElementsByClassName("imageBox")[0].getElementsByTagName("img")[0].src);
         document.getElementsByClassName("imageBox")[0].remove();
     }
-}
+};
 
 document.getElementsByClassName("transform")[0].onclick = () => {
+    if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     if(document.getElementsByClassName("imageBox").length <= 0) return;
 
     //https://www.giftofspeed.com/base64-encoder/
@@ -201,7 +211,7 @@ document.getElementsByClassName("transform")[0].onclick = () => {
             });
         }
     }, 700);
-}
+};
 
 const imageFileAdd = file => {
     if(!file.type.startsWith("image/") || file.type.includes("svg")) return;
@@ -227,7 +237,6 @@ const imageFileAdd = file => {
 
     const image = document.createElement("img");
     image.src = URL.createObjectURL(file);
-    image.setAttribute("draggable", false);
 
     canvas.appendChild(image);
     imageItem.appendChild(canvas);
@@ -240,13 +249,22 @@ const imageFileAdd = file => {
 
     loc.insertBefore(imageDivBox, plusBtn);
 
-    imageDivBox.ondragstart = () => {
-        const target = event.target;
+    image.ondragstart = () => {
+        if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
+        const target = image;
         pdfBlockMove = target;
-        event.dataTransfer.setDragImage(target, target.offsetWidth / 2, target.offsetHeight / 2);
+        event.dataTransfer.setDragImage(image, image.offsetWidth / 2, image.offsetHeight / 2);
     }
 
+    imageDivBox.ondragstart = () => {
+        if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
+        const target = event.target;
+        pdfBlockMove = target;
+        event.dataTransfer.setDragImage(image, image.offsetWidth / 2, image.offsetHeight / 2);
+    };
+
     imageDivBox.ondragover = () => {
+        if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
         if(!pdfBlockMove) return;
         event.preventDefault();
         switch(dragDivLocation(event)) {
@@ -259,15 +277,17 @@ const imageFileAdd = file => {
                 break;
             }
         }
-    }
+    };
 
     imageDivBox.ondragleave = () => {
+        if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
         if(!pdfBlockMove) return;
         if(imageDivBox.hasAttribute("dragLoc"))
             imageDivBox.removeAttribute("dragLoc");
-    }
+    };
 
     imageDivBox.ondrop = () => {
+        if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
         if(!pdfBlockMove) return;
         if(imageDivBox.hasAttribute("dragLoc"))
             imageDivBox.removeAttribute("dragLoc");
@@ -282,17 +302,18 @@ const imageFileAdd = file => {
                 imageDivBox.insertAdjacentElement("afterend", target);
             }
         }
-    }
+    };
 
     deleteBtn.onclick = () => {
+        if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
         URL.revokeObjectURL(image.src);
         imageDivBox.remove();
-    }
-}
+    };
+};
 
 const dragDivLocation = e => {
     return (e.target.offsetWidth / 2 < e.offsetX) ? 1 : 0;
-}
+};
 
 const createLoadingPage = (msg) => {
     const box = document.createElement("div");
@@ -309,4 +330,4 @@ const createLoadingPage = (msg) => {
     box.appendChild(progressBar);
 
     return box;
-}
+};
