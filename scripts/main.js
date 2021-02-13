@@ -258,7 +258,6 @@ const imageFileAdd = file => {
         if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
         const target = imageDivBox;
         pdfBlockMove = target;
-        console.log(target);
         event.dataTransfer.setDragImage(image, image.offsetWidth / 2, image.offsetHeight / 2);
     };
 
