@@ -3,14 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>이미지 PDF 변환</title>
+    <title>イメージを PDF に変換</title>
     <link rel="shortcut icon" href="logo.png">
-    <link rel="alternate" hreflang="x-default" href="index.html"/>
-    <link rel="alternate" hreflang="ko" href="ko.html"/>
-    <link rel="alternate" hreflang="en" href="en.html"/>
-    <link rel="alternate" hreflang="jp" href="jp.html"/>
     <script type="text/javascript" src="scripts/main.min.js" defer></script>
-    <script type="text/javascript" src="scripts/translation.min.js" defer></script>
     <script type="text/javascript" src="scripts/compressor.min.js" defer></script>
     <script type="text/javascript" src="scripts/jspdf.umd.min.js" defer></script>
     <script type="text/javascript" src="scripts/worker.min.js" defer></script>
@@ -24,45 +19,45 @@
     <input class="inpFile" type="file" accept="image/bmp,image/dib,image/jfif,image/pjpeg,image/jpeg,image/pjp,image/jpg,image/png,image/tiff,image/tif,image/gif" multiple>
     <header class="topbar">
         <div class="topbarTopMenu">
-            <button class="clear" data-lang>초기화</button>
-            <button class="transform" data-lang>변환하기</button>
+            <button class="clear">しょきか</button>
+            <button class="transform">へんかん</button>
         </div>
         <div class="topbarOptionsBox">
             <div class="orderByBox">
-                <button class="orderByCommandBtn" data-type="up" data-lang>오름차순</button>
+                <button class="orderByCommandBtn" data-type="up">しょうじゅん</button>
                 <button class="orderByTypeBtn">
                     <svg viewBox="0 0 16 16">
                         <path d="M13.3333 4L14.6666 5.33333L7.99992 12L1.33325 5.33333L2.66659 4L7.99992 9.5L13.3333 4Z"></path>
                     </svg>
                 </button>
                 <div class="orderByOptionSet">
-                    <button class="orderByOptionItem" data-type="down" data-lang>내림차순</button>
+                    <button class="orderByOptionItem" data-type="down">こうじゅん</button>
                 </div>
             </div>
 
-            <select class="pdfOptionSetting pdfOptionCompress" title="압축">
-                <option value="0" data-lang selected>무손실</option>
-                <option value="1" data-lang>저손실</option>
-                <option value="2" data-lang>손실</option>
-                <option value="3" data-lang>고손실</option>
+            <select class="pdfOptionSetting pdfOptionCompress" title="あっしゅく">
+                <option value="0" selected>しないこと</option>
+                <option value="1">じゃっかん</option>
+                <option value="2">ふつう</option>
+                <option value="3">たくさん</option>
             </select>
 
-            <select class="pdfOptionSetting pdfOptionFormat" title="페이지">
+            <select class="pdfOptionSetting pdfOptionFormat" title="ペイジ">
                 <option value="a3">A3</option>
                 <option value="a4">A4</option>
                 <option value="a5">A5</option>
-                <option value="letter" data-lang>문자</option>
-                <option value="auto" data-lang selected>자동</option>
+                <option value="letter">もじ</option>
+                <option value="auto" selected>じどう</option>
             </select>
             <select class="pdfOptionSetting pdfOptionOrientation" disabled>
-                <option value="landscape" data-lang>가로</option>
-                <option value="portrait" data-lang selected>세로</option>
+                <option value="landscape">横向き</option>
+                <option value="portrait" selected>たて</option>
             </select>
             <select class="pdfOptionSetting pdfOptionUtil">
                 <option value="pt">pt</option>
                 <option value="mm" selected>mm</option>
                 <option value="cm">cm</option>
-                <option value="in" data-lang>인치</option>
+                <option value="in">inch</option>
             </select>
         </div>
     </header>
@@ -78,7 +73,7 @@
                         <path d="M256,176h-48v-48c0-8.832-7.168-16-16-16c-8.832,0-16,7.168-16,16v48h-48c-8.832,0-16,7.168-16,16c0,8.832,7.168,16,16,16
                             h48v48c0,8.832,7.168,16,16,16c8.832,0,16-7.168,16-16v-48h48c8.832,0,16-7.168,16-16C272,183.168,264.832,176,256,176z"/>
                     </svg>
-                    <div data-lang>파일 추가<br>(혹은 드래그 드롭)</div>
+                    <div>ファイル追加<br>(あるいはドラッグアンドドロップ)</div>
                 </div>
             </div>
         </div>

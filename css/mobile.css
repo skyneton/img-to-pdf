@@ -32,7 +32,7 @@
     }
 
     .fileAddBox {
-        margin: 130px;
+        margin: 110px;
     }
 }@media (max-width: 850px) {
     .imageBox {
@@ -62,6 +62,6 @@
     }
 
     .fileAddBox {
-        margin: 80px;
+        margin: 60px;
     }
 }

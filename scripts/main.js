@@ -19,7 +19,7 @@ window.ondrop = () => {
     event.stopPropagation();
     event.preventDefault();
     const files = (() => {
-        if(document.getElementsByClassName("orderByCommandBtn")[0].innerText == "오름차순")
+        if(document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type") == "up")
             return [...(event.target.files || event.dataTransfer.files)].sort((a, b) => {
                 return ((a.name == b.name) ? 0 :
                     (a.name > b.name) ? 1 : -1);
@@ -37,7 +37,7 @@ window.ondrop = () => {
 
 document.getElementsByClassName("inpFile")[0].onchange = () => {
     const files = (() => {
-        if(document.getElementsByClassName("orderByCommandBtn")[0].innerText == "오름차순") {
+        if(document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type") == "up") {
             return [...(event.target.files || event.dataTransfer.files)].sort((a, b) => {
                 return ((a.name == b.name) ? 0 :
                     (a.name > b.name) ? 1 : -1);
@@ -58,7 +58,7 @@ document.getElementsByClassName("orderByCommandBtn")[0].onclick = () => {
     const plusBtn = document.getElementsByClassName("fileAddBox")[0];
     const list = [...document.getElementsByClassName("imageBox")];
     (() => {
-        if(document.getElementsByClassName("orderByCommandBtn")[0].innerText == "오름차순") {
+        if(document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type") == "up") {
             return list.sort((a, b) => {
                 return ((a.getElementsByClassName("imageName")[0].innerText == b.getElementsByClassName("imageName")[0].innerText) ? 0 :
                     (a.getElementsByClassName("imageName")[0].innerText > b.getElementsByClassName("imageName")[0].innerText) ? 1 : -1);
@@ -111,6 +111,9 @@ document.getElementsByClassName("orderByOptionItem")[0].onclick = () => {
     const temp = document.getElementsByClassName("orderByCommandBtn")[0].innerText;
     document.getElementsByClassName("orderByCommandBtn")[0].innerText = document.getElementsByClassName("orderByOptionItem")[0].innerText;
     document.getElementsByClassName("orderByOptionItem")[0].innerText = temp;
+    const dataTemp = document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type");
+    document.getElementsByClassName("orderByCommandBtn")[0].setAttribute("data-type", document.getElementsByClassName("orderByOptionItem")[0].getAttribute("data-type"));
+    document.getElementsByClassName("orderByOptionItem")[0].setAttribute("data-type", dataTemp);
 }
 
 window.onmouseup = () => {
@@ -141,7 +144,14 @@ document.getElementsByClassName("transform")[0].onclick = () => {
 
     //https://www.giftofspeed.com/base64-encoder/
 
-    const downloadPage = createLoadingPage("PDF를 생성중입니다.");
+    const downloadPage = createLoadingPage((() => {
+        if(document.title == "이미지 PDF 변환")
+            return "PDF를 생성중입니다.";
+        if(document.title == "イメージを PDF に変換")
+            return "PDFを作成中です。";
+        else
+            return "Generating PDF.";
+    })());
     document.body.appendChild(downloadPage);
 
     const orientation = document.getElementsByClassName("pdfOptionOrientation")[0].value;
@@ -167,13 +177,27 @@ document.getElementsByClassName("transform")[0].onclick = () => {
             imageListPDFByThread(downloadPage, orientation, util, format, multiple, imageList, compress).catch((e) => {
                 console.error(e);
                 downloadPage.remove();
-                alert("알수없는 오류!");
+                alert((() => {
+                    if(document.title == "이미지 PDF 변환")
+                        return "알수없는 오류!";
+                    if(document.title == "イメージを PDF に変換")
+                        return "不明なエラーです。";
+                    else
+                        return "Unknown error!";
+                })());
             });
         }else {
             imageListPDF(downloadPage, orientation, util, format, multiple, imageList, compress).catch((e) => {
                 console.error(e);
                 downloadPage.remove();
-                alert("알수없는 오류!");
+                alert((() => {
+                    if(document.title == "이미지 PDF 변환")
+                        return "알수없는 오류!";
+                    if(document.title == "イメージを PDF に変換")
+                        return "不明なエラーです。";
+                    else
+                        return "Unknown error!";
+                })());
             });
         }
     }, 700);
