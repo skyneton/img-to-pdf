@@ -23,12 +23,12 @@ window.ondrop = () => {
     const files = (() => {
         if(document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type") == "up")
             return [...(event.target.files || event.dataTransfer.files)].sort((a, b) => {
-                return ((a.name == b.name) ? 0 :
-                    (a.name > b.name) ? 1 : -1);
+                const maxlength = a.name.length > b.name.length ? a.name.length : b.name.length;
+                return ((a.name == b.name) ? 0 : (a.name.padStart(maxlength, " ") > b.name.padStart(maxlength, " ")) ? 1 : -1);
             });
         return [...(event.target.files || event.dataTransfer.files)].sort((a, b) => {
-            return ((a.name == b.name) ? 0 :
-                (a.name < b.name) ? 1 : -1);
+            const maxlength = a.name.length > b.name.length ? a.name.length : b.name.length;
+            return ((a.name == b.name) ? 0 : (a.name.padStart(maxlength, " ") < b.name.padStart(maxlength, " ")) ? 1 : -1);
         });
     })();
     for(let i = 0; i < files.length; i++) {
@@ -42,13 +42,13 @@ document.getElementsByClassName("inpFile")[0].onchange = () => {
     const files = (() => {
         if(document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type") == "up") {
             return [...(event.target.files || event.dataTransfer.files)].sort((a, b) => {
-                return ((a.name == b.name) ? 0 :
-                    (a.name > b.name) ? 1 : -1);
+                const maxlength = a.name.length > b.name.length ? a.name.length : b.name.length;
+                return ((a.name == b.name) ? 0 : (a.name.padStart(maxlength, " ") > b.name.padStart(maxlength, " ")) ? 1 : -1);
             });
         }
         return [...(event.target.files || event.dataTransfer.files)].sort((a, b) => {
-            return ((a.name == b.name) ? 0 :
-                (a.name < b.name) ? 1 : -1);
+            const maxlength = a.name.length > b.name.length ? a.name.length : b.name.length;
+            return ((a.name == b.name) ? 0 : (a.name.padStart(maxlength, " ") < b.name.padStart(maxlength, " ")) ? 1 : -1);
         });
     })();
     for(let i = 0; i < files.length; i++) {
@@ -64,13 +64,18 @@ document.getElementsByClassName("orderByCommandBtn")[0].onclick = () => {
     (() => {
         if(document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type") == "up") {
             return list.sort((a, b) => {
-                return ((a.getElementsByClassName("imageName")[0].innerText == b.getElementsByClassName("imageName")[0].innerText) ? 0 :
-                    (a.getElementsByClassName("imageName")[0].innerText > b.getElementsByClassName("imageName")[0].innerText) ? 1 : -1);
+                a = a.getElementsByClassName("imageName")[0].innerText;
+                b = b.getElementsByClassName("imageName")[0].innerText;
+                const maxlength = a.name.length > b.name.length ? a.name.length : b.name.length;
+                return ((a == b) ? 0 :
+                    (a.padStart(maxlength, " ") > b.padStart(maxlength, " ")) ? 1 : -1);
             });
         }
         return list.sort((a, b) => {
-            return ((a.getElementsByClassName("imageName")[0].innerText == b.getElementsByClassName("imageName")[0].innerText) ? 0 :
-                (a.getElementsByClassName("imageName")[0].innerText < b.getElementsByClassName("imageName")[0].innerText) ? 1 : -1);
+            a = a.getElementsByClassName("imageName")[0].innerText;
+            b = b.getElementsByClassName("imageName")[0].innerText;
+            const maxlength = a.name.length > b.name.length ? a.name.length : b.name.length;
+            return ((a == b) ? 0 : (a.padStart(maxlength, " ") < b.padStart(maxlength, " ")) ? 1 : -1);
         });
     })().forEach(item => {
         loc.insertBefore(item, plusBtn);
