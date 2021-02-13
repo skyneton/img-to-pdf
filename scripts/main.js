@@ -251,10 +251,10 @@ const imageFileAdd = file => {
 
     image.ondragstart = () => {
         if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
-        const target = image;
+        const target = imageDivBox;
         pdfBlockMove = target;
         event.dataTransfer.setDragImage(image, image.offsetWidth / 2, image.offsetHeight / 2);
-    }
+    };
 
     imageDivBox.ondragstart = () => {
         if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
