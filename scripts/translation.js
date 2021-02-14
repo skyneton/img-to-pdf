@@ -14,7 +14,7 @@ const lang = {
         },
         pdfOptionOpientation: ["가로", "세로"],
         pdfOptionUtil: ["인치"],
-        imageListBox: ["파일추가<br>(혹은 드래그 드롭)"]
+        imageListBox: ["파일 추가<br>(혹은 드래그 드롭)"]
     },
     jp: {
         title: "イメージを PDF に変換",
