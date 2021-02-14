@@ -21,7 +21,11 @@ const worker_function = () => {
             if(revoke) URL.revokeObjectURL(src);
 
             if(index.add() >= max) {
-                self.postMessage(URL.createObjectURL(doc.output("blob")));
+                try {
+                    self.postMessage({data: URL.createObjectURL(doc.output("blob")), type: "finish"});
+                }catch {
+                    self.postMessage({type: "error"});
+                }
             }
         });
     }
@@ -174,11 +178,19 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
         }
 
         worker.addEventListener("message", e => {
-            saveAs(e.data, `${imageList[0].getElementsByClassName("imageName")[0].innerText.substring(imageList[0].getElementsByClassName("imageName")[0].innerText.lastIndexOf("."), 0)}.pdf`);
-            downloadPage.remove();
             worker.terminate();
             URL.revokeObjectURL(workerURL);
             URL.revokeObjectURL(jspdfURL);
+            switch(e.data.type) {
+                case "finish": {
+                    saveAs(e.data.data, `${imageList[0].getElementsByClassName("imageName")[0].innerText.substring(imageList[0].getElementsByClassName("imageName")[0].innerText.lastIndexOf("."), 0)}.pdf`);
+                    downloadPage.remove();
+                    break;
+                }
+                case "error": {
+                    throw new Error("ERROR");
+                }
+            }
         });
         worker.postMessage(packet);
 

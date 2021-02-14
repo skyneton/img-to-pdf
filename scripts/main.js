@@ -336,3 +336,13 @@ const createLoadingPage = (msg) => {
 
     return box;
 };
+window.onkeydown = () => {
+    if(event.keyCode == 36) {
+        document.getElementsByClassName("imageListBox")[0].scrollTop = 0;
+        event.preventDefault();
+    }
+    else if(event.keyCode == 35) {
+        document.getElementsByClassName("imageListBox")[0].scrollTop = document.getElementsByClassName("imageListBox")[0].scrollHeight;
+        event.preventDefault();
+    }
+}
