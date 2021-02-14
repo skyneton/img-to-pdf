@@ -1,6 +1,7 @@
 const lang = {
     ko: {
         title: "이미지 PDF 변환",
+        description: "이미지를 PDF로 변환합니다. 드래그 앤 드롭을 통해 이미지를 추가할 수 있습니다. 정렬: 이미지의 이름을 통해 정렬합니다. 압축: 변환된 PDF 사이즈를 줄입니다.",
         topbarTopMenu: ["초기화", "변환하기"],
         orderByBox: ["오름차순", "내림차순"],
         pdfOptionCompress: {
@@ -17,6 +18,7 @@ const lang = {
     },
     jp: {
         title: "イメージを PDF に変換",
+        description: "画像をPDFに変換します。 ドラッグ&ドロップで画像を追加できます。 並べ替え:画像の名前を通して並べ替えます。 圧縮:変換されたPDF サイズを小さくします。",
         topbarTopMenu: ["しょきか", "へんかん"],
         orderByBox: ["しょうじゅん", "こうじゅん"],
         pdfOptionCompress: {
@@ -33,6 +35,7 @@ const lang = {
     },
     en: {
         title: "Image to PDF",
+        description: "Convert the image to PDF. You can add images through drag and drop. Sort — Sorts through the name of the image. Compression: Reduce the converted PDF size.",
         topbarTopMenu: ["Clear", "Convert"],
         orderByBox: ["Ascending", "Descending"],
         pdfOptionCompress: {
@@ -90,6 +93,8 @@ const languageSetting = () => {
                 imageListBox[i].innerHTML = lang.ko.imageListBox[i];
             }
             document.title = lang.ko.title;
+            document.head.querySelector("meta[name=\"og:title\"]").setAttribute("content", lang.ko.title);
+            document.head.querySelector("meta[name=\"og:description\"]").setAttribute("content", lang.ko.description);
             break;
         }
         case "ja": case "ja-JP": {
@@ -130,6 +135,8 @@ const languageSetting = () => {
                 imageListBox[i].innerHTML = lang.jp.imageListBox[i];
             }
             document.title = lang.jp.title;
+            document.head.querySelector("meta[name=\"og:title\"]").setAttribute("content", lang.jp.title);
+            document.head.querySelector("meta[name=\"og:description\"]").setAttribute("content", lang.jp.description);
             break;
         }
         default: {
@@ -170,6 +177,8 @@ const languageSetting = () => {
                 imageListBox[i].innerHTML = lang.en.imageListBox[i];
             }
             document.title = lang.en.title;
+            document.head.querySelector("meta[name=\"og:title\"]").setAttribute("content", lang.en.title);
+            document.head.querySelector("meta[name=\"og:description\"]").setAttribute("content", lang.en.description);
             break;
         }
     }   
