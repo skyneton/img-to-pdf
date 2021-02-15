@@ -1,3 +1,5 @@
+const { abort } = require("process");
+
 const worker_function = () => {
 
     let doc;
@@ -22,12 +24,21 @@ const worker_function = () => {
 
             if(index.add() >= max) {
                 try {
+                    console.log(URL.createObjectURL([doc.output()], { type: "application/pdf" }));
                     self.postMessage({data: URL.createObjectURL(doc.output("blob")), type: "finish"});
                 }catch {
                     self.postMessage({type: "error"});
                 }
             }
         });
+    }
+
+    const getArrayBuffer = data => {
+        let len = data.length;
+        const ab = new ArrayBuffer(len);
+        const u8 = new Uint8Array(ab);
+        while(len--) u8[len] = data.charCodeAt(len);
+        return ab;
     }
     
     const index = new function() {
@@ -188,7 +199,15 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
                     break;
                 }
                 case "error": {
-                    throw new Error("ERROR");
+                    downloadPage.remove();
+                    alert((() => {
+                        if(document.title == "이미지 PDF 변환")
+                            return "알수없는 오류!";
+                        if(document.title == "イメージを PDF に変換")
+                            return "不明なエラーです。";
+                        else
+                            return "Unknown error!";
+                    })());
                 }
             }
         });
