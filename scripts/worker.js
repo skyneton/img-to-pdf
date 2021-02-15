@@ -1,5 +1,3 @@
-const { abort } = require("process");
-
 const worker_function = () => {
 
     let doc;
