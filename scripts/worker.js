@@ -22,21 +22,12 @@ const worker_function = () => {
 
             if(index.add() >= max) {
                 try {
-                    console.log(URL.createObjectURL([doc.output()], { type: "application/pdf" }));
                     self.postMessage({data: URL.createObjectURL(doc.output("blob")), type: "finish"});
                 }catch {
                     self.postMessage({type: "error"});
                 }
             }
         });
-    }
-
-    const getArrayBuffer = data => {
-        let len = data.length;
-        const ab = new ArrayBuffer(len);
-        const u8 = new Uint8Array(ab);
-        while(len--) u8[len] = data.charCodeAt(len);
-        return ab;
     }
     
     const index = new function() {
