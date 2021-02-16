@@ -241,7 +241,7 @@ const imageFileAdd = file => {
     canvas.setAttribute("class", "imageCanvas");
 
     const image = document.createElement("img");
-    image.src = URL.createObjectURL(file);
+    image.src = URL.createObjectURL(new Blob([file], {type: file.type}));
 
     canvas.appendChild(image);
     imageItem.appendChild(canvas);

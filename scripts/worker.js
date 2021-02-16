@@ -22,8 +22,9 @@ const worker_function = () => {
 
             if(index.add() >= max) {
                 try {
-                    self.postMessage({data: URL.createObjectURL(doc.output("blob")), type: "finish"});
-                }catch {
+                    self.postMessage({data: URL.createObjectURL(doc.toBlob()), type: "finish"});
+                }catch(e) {
+                    console.log(e);
                     self.postMessage({type: "error"});
                 }
             }
@@ -83,7 +84,7 @@ const addImage = (doc, page, src, width, height, format, name, index, max, loadi
         if(revoke) URL.revokeObjectURL(src);
 
         if(index.add() >= max) {
-            const url = URL.createObjectURL(doc.output("blob"));
+            const url = URL.createObjectURL(doc.toBlob());
             saveAs(url, name);
             URL.revokeObjectURL(url);
             loadingPage.remove();
