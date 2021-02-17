@@ -87,7 +87,7 @@ const addImage = (doc, page, src, width, height, format, name, index, max, loadi
         const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? doc.getPageHeight(page)/height : doc.getPageWidth(page)/width);
         const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
         const subHeight = (doc.getPageHeight(page) - height * persentage)/2;
-        doc.drawImage(src, subWidth, subHeight, doc.getPageWidth(page) - subWidth * 2, doc.getPageHeight(page) - subHeight * 2).then(() => { addData(); });
+        doc.drawImage(src, subWidth, subHeight, doc.getPageWidth(page) - subWidth, doc.getPageHeight(page) - subHeight).then(() => { addData(); });
     }
 }
 

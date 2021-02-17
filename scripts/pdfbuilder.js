@@ -402,6 +402,10 @@ class PDFBuilder {
         }
 
         if(isNaN(x) || isNaN(y)) throw new Error("x, y는 숫자 형태여야 합니다.");
+        if(typeof x != "undefined") x = this.#NumberRound(x, 5);
+        if(typeof y != "undefined") y = this.#NumberRound(y, 5);
+        if(typeof w != "undefined") w = this.#NumberRound(w, 5);
+        if(typeof h != "undefined") h = this.#NumberRound(h, 5);
 
         return this.#drawImageToPDF(this.#currentPage, imageData, x, y, w, h);
     }
@@ -680,5 +684,9 @@ class PDFBuilder {
 
     #getImageContentIndex(key) {
         return Object.keys(this.#imageContent).indexOf(key);
+    }
+
+    #NumberRound(value, num) {
+        return Math.round(value * 10**num)/10**num;
     }
 }
