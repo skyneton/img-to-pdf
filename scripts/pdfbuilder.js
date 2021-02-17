@@ -119,12 +119,12 @@ class PDFBuilder {
     }
 
     getPageWidth() {
-        page = arguments[0] | this.#currentPage;
+        const page = arguments[0] | this.#currentPage;
         return this.#pageContent[page].media.width;
     }
 
     getPageHeight() {
-        page = arguments[0] | this.#currentPage;
+        const page = arguments[0] | this.#currentPage;
         return this.#pageContent[page].media.height;
     }
 
