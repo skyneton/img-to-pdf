@@ -12,7 +12,7 @@ class PDFBuilder {
 
     constructor() {
         let orientation, format, rotate;
-        if(arguments.length > 1) {
+        if(arguments.length >= 1) {
             if(typeof arguments[0] == "number") {
                 orientation = arguments[0];
                 format = arguments[1];
