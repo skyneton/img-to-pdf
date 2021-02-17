@@ -19,7 +19,7 @@ const worker_function = () => {
         if(format == "auto") {
             doc.drawImage(src).then(() => { addData(); });
         }else {
-            const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? self.doc.getPageHeight(page)/height : self.doc.getPageWidth(page)/width);
+            const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? doc.getPageHeight(page)/height : doc.getPageWidth(page)/width);
             const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
             const subHeight = (doc.getPageHeight(page) - height * persentage)/2;
             doc.drawImage(src, subWidth, subHeight, doc.getPageWidth(page) - subWidth * 2, doc.getPageHeight(page) - subHeight * 2).then(() => { addData(); });
