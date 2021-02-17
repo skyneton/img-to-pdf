@@ -119,12 +119,18 @@ class PDFBuilder {
     }
 
     getPageWidth() {
-        const page = arguments[0] | this.#currentPage;
+        let page = arguments[0];
+        if(typeof page == "undefined") page = this.#currentPage;
+        if(isNaN(page)) throw new Error("숫자를 입력해주세요.");
+        if(page < 0 || Math.floor(page) != page) throw new Error("0 이상의 정수여야 합니다.");
         return this.#pageContent[page].media.width;
     }
 
     getPageHeight() {
-        const page = arguments[0] | this.#currentPage;
+        let page = arguments[0];
+        if(typeof page == "undefined") page = this.#currentPage;
+        if(isNaN(page)) throw new Error("숫자를 입력해주세요.");
+        if(page < 0 || Math.floor(page) != page) throw new Error("0 이상의 정수여야 합니다.");
         return this.#pageContent[page].media.height;
     }
 
