@@ -10,10 +10,9 @@ const lang = {
         },
         pdfOptionFormat: {
             title: "페이지",
-            child: ["문자", "자동"],
+            child: ["자동"],
         },
         pdfOptionOpientation: ["가로", "세로"],
-        pdfOptionUtil: ["인치"],
         imageListBox: ["파일 추가<br>(혹은 드래그 드롭)"]
     },
     jp: {
@@ -27,10 +26,9 @@ const lang = {
         },
         pdfOptionFormat: {
             title: "ペイジ",
-            child: ["もじ", "じどう"],
+            child: ["じどう"],
         },
         pdfOptionOpientation: ["横向き", "たて"],
-        pdfOptionUtil: ["inch"],
         imageListBox: ["ファイル追加<br>(あるいはドラッグアンドドロップ)"]
     },
     en: {
@@ -44,10 +42,9 @@ const lang = {
         },
         pdfOptionFormat: {
             title: "page",
-            child: ["Text", "Auto"],
+            child: ["Auto"],
         },
         pdfOptionOpientation: ["Landscape", "Portrait"],
-        pdfOptionUtil: ["inch"],
         imageListBox: ["File Add<br>(or Drag and Drop)"]
     },
 };
@@ -82,12 +79,6 @@ const languageSetting = () => {
             for(const i in pdfOptionOrientation) {
                 pdfOptionOrientation[i].innerText = lang.ko.pdfOptionOpientation[i];
             }
-
-            const pdfOptionUtil = document.querySelectorAll(".pdfOptionUtil [data-lang]");
-            for(const i in pdfOptionUtil) {
-                pdfOptionUtil[i].innerText = lang.ko.pdfOptionUtil[i];
-            }
-
             const imageListBox = document.querySelectorAll(".imageListBox [data-lang]");
             for(const i in imageListBox) {
                 imageListBox[i].innerHTML = lang.ko.imageListBox[i];
@@ -124,12 +115,6 @@ const languageSetting = () => {
             for(const i in pdfOptionOrientation) {
                 pdfOptionOrientation[i].innerText = lang.jp.pdfOptionOpientation[i];
             }
-
-            const pdfOptionUtil = document.querySelectorAll(".pdfOptionUtil [data-lang]");
-            for(const i in pdfOptionUtil) {
-                pdfOptionUtil[i].innerText = lang.jp.pdfOptionUtil[i];
-            }
-
             const imageListBox = document.querySelectorAll(".imageListBox [data-lang]");
             for(const i in imageListBox) {
                 imageListBox[i].innerHTML = lang.jp.imageListBox[i];
@@ -165,11 +150,6 @@ const languageSetting = () => {
             const pdfOptionOrientation = document.querySelectorAll(".pdfOptionOrientation [data-lang]");
             for(const i in pdfOptionOrientation) {
                 pdfOptionOrientation[i].innerText = lang.en.pdfOptionOpientation[i];
-            }
-
-            const pdfOptionUtil = document.querySelectorAll(".pdfOptionUtil [data-lang]");
-            for(const i in pdfOptionUtil) {
-                pdfOptionUtil[i].innerText = lang.en.pdfOptionUtil[i];
             }
 
             const imageListBox = document.querySelectorAll(".imageListBox [data-lang]");

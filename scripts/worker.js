@@ -3,32 +3,27 @@ const worker_function = () => {
     let doc;
 
     const addImage = (page, src, width, height, format, max, revoke = false) => {
-        setTimeout(() => {
-            try {
-                doc.setPage(page);
-                if(format == "auto") {
-                    doc.setPageWidth(page, width);
-                    doc.setPageHeight(page, height);
-                    doc.addImage(src, "JPEG", 0, 0, width, height);
-                }else {
-                    const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? self.doc.getPageHeight(page)/height : self.doc.getPageWidth(page)/width);
-                    const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
-                    const subHeight = (doc.getPageHeight(page) - height * persentage)/2;
-                    doc.addImage(src, "JPEG", subWidth, subHeight, doc.getPageWidth(page) - subWidth, doc.getPageHeight(page) - subHeight);
-                }
-            }catch(e) { console.log(e); }
-
+        const addData = () => {
             if(revoke) URL.revokeObjectURL(src);
 
             if(index.add() >= max) {
                 try {
                     self.postMessage({data: URL.createObjectURL(doc.toBlob()), type: "finish"});
                 }catch(e) {
-                    console.log(e);
                     self.postMessage({type: "error"});
                 }
             }
-        });
+        }
+
+        doc.setPage(page);
+        if(format == "auto") {
+            doc.drawImage(src).then(() => { addData(); });
+        }else {
+            const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? self.doc.getPageHeight(page)/height : self.doc.getPageWidth(page)/width);
+            const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
+            const subHeight = (doc.getPageHeight(page) - height * persentage)/2;
+            doc.drawImage(src, subWidth, subHeight, doc.getPageWidth(page) - subWidth * 2, doc.getPageHeight(page) - subHeight * 2).then(() => { addData(); });
+        }
     }
     
     const index = new function() {
@@ -42,25 +37,21 @@ const worker_function = () => {
         switch(packet.type) {
             case "start": {
                 importScripts(packet.url);
-                doc = PDFCreate(packet.orientation, packet.util, packet.format);
+                doc = PDFCreate(packet.orientation, packet.format);
                 break;
             }
             case "image": {
-                while(doc.getNumberOfPages() < packet.page) doc.addPage();
+                while(doc.getNumberOfPages() < packet.page + 1) doc.addPage();
                 addImage(packet.page, packet.src, packet.width, packet.height, packet.format, packet.max, packet.revoke);
                 break;
             }
         }
     });
 
-    const PDFCreate = (orientation, util, format) => {
-        const doc = new jspdf.jsPDF({
+    const PDFCreate = (orientation, format) => {
+        const doc = new PDFBuilder({
             orientation: orientation,
-            unit: util,
-            format: (() => {
-                if(format == "auto") return "a4";
-                return format;
-            })()
+            format: format
         });
     
         return doc;
@@ -68,38 +59,42 @@ const worker_function = () => {
 }
 
 const addImage = (doc, page, src, width, height, format, name, index, max, loadingPage, revoke = false) => {
-    setTimeout(() => {
-        doc.setPage(page);
-        if(format == "auto") {
-            doc.setPageWidth(page, width);
-            doc.setPageHeight(page, height);
-            doc.addImage(src, "JPEG", 0, 0, width, height);
-        }else {
-            const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? doc.getPageHeight(page)/height : doc.getPageWidth(page)/width);
-            const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
-            const subHeight = (doc.getPageHeight(page) - height * persentage)/2;
-            doc.addImage(src, "JPEG", subWidth, subHeight, doc.getPageWidth(page) - subWidth, doc.getPageHeight(page) - subHeight);
-        }
-
+    const addData = () => {
         if(revoke) URL.revokeObjectURL(src);
-
         if(index.add() >= max) {
-            const url = URL.createObjectURL(doc.toBlob());
-            saveAs(url, name);
-            URL.revokeObjectURL(url);
-            loadingPage.remove();
+            try {
+                const url = URL.createObjectURL(doc.toBlob());
+                saveAs(url, name);
+                URL.revokeObjectURL(url);
+                loadingPage.remove();
+            }catch(e) {
+                loadingPage.remove();
+                alert((() => {
+                    if(document.title == "이미지 PDF 변환")
+                        return "알수없는 오류!";
+                    if(document.title == "イメージを PDF に変換")
+                        return "不明なエラーです。";
+                    else
+                        return "Unknown error!";
+                })());
+            }
         }
-    });
+    };
+    doc.setPage(page);
+    if(format == "auto") {
+        doc.drawImage(src).then(() => { addData(); });
+    }else {
+        const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? doc.getPageHeight(page)/height : doc.getPageWidth(page)/width);
+        const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
+        const subHeight = (doc.getPageHeight(page) - height * persentage)/2;
+        doc.drawImage(src, subWidth, subHeight, doc.getPageWidth(page) - subWidth * 2, doc.getPageHeight(page) - subHeight * 2).then(() => { addData(); });
+    }
 }
 
-const PDFCreate = (orientation, util, format) => {
-    const doc = new jspdf.jsPDF({
+const PDFCreate = (orientation, format) => {
+    const doc = new PDFBuilder({
         orientation: orientation,
-        unit: util,
-        format: (() => {
-            if(format == "auto") return "a4";
-            return format;
-        })()
+        format: format
     });
 
     return doc;
@@ -125,9 +120,9 @@ const getImageSrc = (url, compress, percent) => {
     });
 }
 
-const imageListPDF = (downloadPage, orientation, util, format, multiple, imageList, compress) => {
+const imageListPDF = (downloadPage, orientation, format, imageList, compress) => {
     return new Promise(() => {
-        const doc = PDFCreate(orientation, util, format);
+        const doc = PDFCreate(orientation, format);
         const name = `${imageList[0].getElementsByClassName("imageName")[0].innerText.substring(imageList[0].getElementsByClassName("imageName")[0].innerText.lastIndexOf("."), 0)}.pdf`;
         const quality = (() => {
             switch(parseInt(compress)) {
@@ -151,16 +146,16 @@ const imageListPDF = (downloadPage, orientation, util, format, multiple, imageLi
             const img = imageList[i].getElementsByTagName("img")[0];
 
             getImageSrc(img.src, compress, quality).then(result => {
-                addImage(doc, i + 1, result, img.naturalWidth * multiple, img.naturalHeight * multiple, format, name, index, imageList.length, downloadPage, compress != 0);
+                addImage(doc, i, result, img.naturalWidth, img.naturalHeight, format, name, index, imageList.length, downloadPage, compress != 0);
             });
         }
     });
 }
 
-const imageListPDFByThread = (downloadPage, orientation, util, format, multiple, imageList, compress) => {
+const imageListPDFByThread = (downloadPage, orientation, format, imageList, compress) => {
     return new Promise(() => {
         const workerURL = URL.createObjectURL(new Blob(["("+worker_function.toString()+")()"], {type: 'text/javascript'}));
-        const jspdfURL = URL.createObjectURL(new Blob(["("+jspdf_worker.toString()+")()"], {type: 'text/javascript'}));
+        const jspdfURL = URL.createObjectURL(new Blob([PDFBuilder.toString()], {type: 'text/javascript'}));
         const worker = new Worker(workerURL);
         const quality = (() => {
             switch(parseInt(compress)) {
@@ -173,15 +168,11 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
         const packet = {
             url: jspdfURL,
             orientation: orientation,
-            util: util,
             format: format,
             type: "start"
         }
 
         worker.addEventListener("message", e => {
-            worker.terminate();
-            URL.revokeObjectURL(workerURL);
-            URL.revokeObjectURL(jspdfURL);
             switch(e.data.type) {
                 case "finish": {
                     saveAs(e.data.data, `${imageList[0].getElementsByClassName("imageName")[0].innerText.substring(imageList[0].getElementsByClassName("imageName")[0].innerText.lastIndexOf("."), 0)}.pdf`);
@@ -200,6 +191,9 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
                     })());
                 }
             }
+            worker.terminate();
+            URL.revokeObjectURL(workerURL);
+            URL.revokeObjectURL(jspdfURL);
         });
         worker.postMessage(packet);
 
@@ -209,10 +203,10 @@ const imageListPDFByThread = (downloadPage, orientation, util, format, multiple,
 
             getImageSrc(img.src, compress, quality).then(result => {
                 const data = {
-                    page: i + 1,
+                    page: i,
                     src: result,
-                    width: img.naturalWidth * multiple,
-                    height: img.naturalHeight * multiple,
+                    width: img.naturalWidth,
+                    height: img.naturalHeight,
                     format: format,
                     max: imageList.length,
                     revoke: compress != 0,

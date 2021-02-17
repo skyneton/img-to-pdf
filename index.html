@@ -12,9 +12,8 @@
     <script type="text/javascript" src="scripts/main.min.js" defer></script>
     <script type="text/javascript" src="scripts/translation.min.js" defer></script>
     <script type="text/javascript" src="scripts/compressor.min.js" defer></script>
-    <script type="text/javascript" src="scripts/jspdf.umd.min.js" defer></script>
+    <script type="text/javascript" src="scripts/pdfbuilder.min.js" defer></script>
     <script type="text/javascript" src="scripts/worker.min.js" defer></script>
-    <script type="text/javascript" src="scripts/jspdf.worker.js" defer></script>
     <meta property="og:type" content="website">
     <meta name="og:image" content="https://skyneton.github.io/img-to-pdf/logo.png">
     <meta name="og:description" content="이미지를 PDF로 변환합니다. 드래그 앤 드롭을 통해 이미지를 추가할 수 있습니다. 정렬: 이미지의 이름을 통해 정렬합니다. 압축: 변환된 PDF 사이즈를 줄입니다.">
@@ -51,23 +50,15 @@
                 <option value="2" data-lang>손실</option>
                 <option value="3" data-lang>고손실</option>
             </select>
-
             <select class="pdfOptionSetting pdfOptionFormat" title="페이지">
                 <option value="a3">A3</option>
                 <option value="a4">A4</option>
                 <option value="a5">A5</option>
-                <option value="letter" data-lang>문자</option>
                 <option value="auto" data-lang selected>자동</option>
             </select>
             <select class="pdfOptionSetting pdfOptionOrientation" disabled>
                 <option value="landscape" data-lang>가로</option>
                 <option value="portrait" data-lang selected>세로</option>
-            </select>
-            <select class="pdfOptionSetting pdfOptionUtil">
-                <option value="pt">pt</option>
-                <option value="mm" selected>mm</option>
-                <option value="cm">cm</option>
-                <option value="in" data-lang>인치</option>
             </select>
         </div>
     </header>

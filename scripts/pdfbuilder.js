@@ -6,7 +6,9 @@ class PDFBuilder {
     #offsets = [];
     #objectNumber = 0;
     #rootDirectoryObjId;
+    #resourceObjId;
     #contentLength = 0;
+    #imageContent = [];
 
     constructor() {
         let orientation, format, rotate;
@@ -99,8 +101,8 @@ class PDFBuilder {
             page = arguments[0];
             width = arguments[1];
         }else width = arguments[0];
-        page = page || this.#currentPage;
-        if(!isNaN(page) || !isNaN(width)) throw new Error("숫자 형태로 입력해주세요.");
+        page = page | this.#currentPage;
+        if(isNaN(page) || isNaN(width)) throw new Error("숫자 형태로 입력해주세요.");
         this.#pageContent[page].media.width = width;
     }
 
@@ -111,9 +113,19 @@ class PDFBuilder {
             page = arguments[0];
             height = arguments[1];
         }else height = arguments[0];
-        page = page || this.#currentPage;
-        if(!isNaN(page) || !isNaN(height)) throw new Error("숫자 형태로 입력해주세요.");
+        page = page | this.#currentPage;
+        if(isNaN(page) || isNaN(height)) throw new Error("숫자 형태로 입력해주세요.");
         this.#pageContent[page].media.height = height;
+    }
+
+    getPageWidth() {
+        page = arguments[0] | this.#currentPage;
+        return this.#pageContent[page].media.width;
+    }
+
+    getPageHeight() {
+        page = arguments[0] | this.#currentPage;
+        return this.#pageContent[page].media.height;
     }
 
     removePage(page) {
@@ -147,7 +159,7 @@ class PDFBuilder {
             "credit-card": [153, 243]
         };
 
-        format = (format || "a4").toLowerCase();
+        format = (format || "auto").toLowerCase();
         
         let pageHeight, pageWidth;
         if(format == "auto") {
@@ -185,6 +197,7 @@ class PDFBuilder {
         this.#resetDocument();
         this.#putHeader();
         this.#putPages();
+        this.#putResources();
         this.#putCatalog();
 
         const offsetOfXRef = this.#contentLength;
@@ -213,6 +226,42 @@ class PDFBuilder {
         }
 
         return new Blob([arrayBuffer], {type: "appliocation/pdf"});
+    }
+
+    #putResources() {
+        const resources = [];
+        if(Object.keys(this.#imageContent).length > 0) {
+            for(const key in this.#imageContent) {
+                const data = this.#imageContent[key];
+                const objId = this.#newObjectDeferred();
+                this.#newObjectDeferredBegin(objId);
+                this.#write("<<");
+                this.#write("/Type /XObject");
+                this.#write("/Subtype /Image");
+                this.#write(`/Width ${data.width}`);
+                this.#write(`/Height ${data.height}`);
+                this.#write(`/BitsPerComponent ${data.bitsPerComponent}`);
+                this.#write(`/ColorSpace /${data.colorSpace}`);
+                this.#write("/Filter /DCTDecode");
+                this.#write(`/Length ${data.data.length}`);
+                this.#write(">>");
+                this.#write("stream");
+                this.#write(data.data);
+                this.#write("endstream");
+                this.#write("endobj");
+                resources.push(objId);
+            }
+        }
+
+        this.#newObjectDeferredBegin(this.#resourceObjId);
+        this.#write("<<");
+        this.#write("/XObject <<");
+        for(let i = 0; i < resources.length; i++) {
+            this.#write(`/I${i} ${resources[i]} 0 R`);
+        }
+        this.#write(">>");
+        this.#write(">>");
+        this.#write("endobj");
     }
 
     #putTrailer() {
@@ -250,9 +299,9 @@ class PDFBuilder {
     }
 
     #putPages() {
-        let kids = "/Kids [";
+        let kids = "/Kids [ ";
         for(let i = 0; i < this.#pageContent.length; i++) {
-            kids += this.#putPage(this.#pageContent[i], this.#newObjectDeferred(), this.#newObjectDeferred(), this.#newObjectDeferred()) + " 0 R ";
+            kids += this.#putPage(this.#pageContent[i], this.#newObjectDeferred(), this.#resourceObjId, this.#newObjectDeferred()) + " 0 R ";
         }
         this.#newObjectDeferredBegin(this.#rootDirectoryObjId);
         this.#write("<<");
@@ -268,9 +317,18 @@ class PDFBuilder {
         this.#write("<<");
         this.#write("/Type /Page");
         this.#write(`/Parent ${this.#rootDirectoryObjId} 0 R`);
-        this.#write(`/Resources << /XObject << ${resourcesObjectId} 0 R >> >>`);
+        if(typeof data.image != "undefined") {
+            this.#write(`/Resources ${resourcesObjectId} 0 R`);
+        }
         if(data.media.format != "auto") {
-            this.#write(`/MediaBox [ 0 0 ${data.media.width} ${data.media.height} ]`);
+            this.#write(`/MediaBox [0 0 ${data.media.width} ${data.media.height}]`);
+        }else if(data.image) {
+            let width = data.image[0].width, height = data.image[0].height;
+            for(let i = 1; i < data.image.length; i++) {
+                if(data.image[i].width > width) width = data.image[i].width;
+                if(data.image[i].height > height) height = data.image[i].height;
+            }
+            this.#write(`/MediaBox [ 0 0 ${width} ${height} ]`);
         }
         if(data.rotate) {
             this.#write(`/Rotate ${data.media.rotate}`);
@@ -279,31 +337,23 @@ class PDFBuilder {
         this.#write(">>");
         this.#write("endobj");
 
-        this.#newObjectDeferredBegin(resourcesObjectId);
+        this.#newObjectDeferredBegin(contentsObjId);
         if(data.image) {
             this.#write("<<");
-            this.#write("/Type /XObject");
-            this.#write("/Subtype /Image");
-            this.#write(`/Width ${data.image.width}`);
-            this.#write(`/Height ${data.image.height}`);
-            this.#write(`/BitsPerComponent ${data.image.bitsPerComponent}`);
-            this.#write(`/ColorSpace /${data.image.colorSpace}`);
-            this.#write("/Filter /DCTDecode");
-            this.#write(`/Length ${data.image.data.length}`);
+            let str = "";
+            for(let i = 0; i < data.image.length; i++) {
+                if(i != 0) str += "\n";
+                str += "q";
+                str += "\n" + [data.image[i].width, "0", "0", data.image[i].height, data.image[i].x, data.image[i].y, "cm" ].join(" ");
+                str += `\n/I${this.#getImageContentIndex(data.image[i].hash)} Do`;
+                str += "\nQ";
+            }
+            this.#write(`/Length ${str.length}`);
             this.#write(">>");
             this.#write("stream");
-            this.#write(data.image.data);
+            this.#write(str);
             this.#write("endstream");
         }
-        this.#write("endobj");
-        this.#newObjectDeferredBegin(contentsObjId);
-        this.#write("<<");
-        this.#write("/Filter /FlateDecode");
-        this.#write("/Length 47");
-        this.#write(">>");
-        this.#write("stream");
-        this.#write("x\x9C+ä256Ó321S0\0BC##K=css#CS…ä\\.\xFD\x97|®@.\0©:");
-        this.#write("endstream");
         this.#write("endobj");
 
         return objId;
@@ -316,6 +366,7 @@ class PDFBuilder {
         this.#offsets = [];
 
         this.#rootDirectoryObjId = this.#newObjectDeferred();
+        this.#resourceObjId = this.#newObjectDeferred();
     }
 
     #putHeader() {
@@ -346,46 +397,127 @@ class PDFBuilder {
 
         if(isNaN(x) || isNaN(y)) throw new Error("x, y는 숫자 형태여야 합니다.");
 
-        this.#drawImageToPDF(imageData, x, y, w, h);
+        return this.#drawImageToPDF(this.#currentPage, imageData, x, y, w, h);
     }
 
-    #drawImageToPDF(imageData, x, y, w, h) {
-        this.#convertBase64ToBinaryString(imageData).then(base64 => {
-            const format = this.#getImageFileTypeByImageData(base64);
-            if(this.isImageNotSupported(format)) throw new Error(`${format} 형식은 지원하지 않는 이미지입니다.`);
+    #drawImageToPDF(page, imageData, x, y, w, h) {
+        return new Promise(resolve => {
+            this.#convertBase64ToBinaryString(imageData).then(base64 => {
+                const format = this.#getImageFileTypeByImageData(base64);
+                if(this.isImageNotSupported(format)) throw new Error(`${format} 형식은 지원하지 않는 이미지입니다.`);
 
-            this.#writeImageToPDF(base64, x, y, w, h);
+                const index = this.#getImageHashCode(base64).toString();
+                if(this.#imageContent[index] != undefined) {
+                    this.#imageContent[index].connection++;
+                    if(this.#pageContent[page].image == undefined) {
+                        this.#pageContent[page].image = [];
+                    }
+                    this.#pageContent[page].image.push({
+                        hash: index,
+                        width: w || this.#imageContent[index].width,
+                        height: h || this.#imageContent[index].height,
+                        x: x,
+                        y: y
+                    });
+                    return;
+                }
+
+                this.#writeImageToPDF(page, base64, x, y, w, h, index, format);
+
+                resolve("drawing finish");
+            });
         });
     }
 
-    #writeImageToPDF(imageData, x, y, width, height) {
-        const imageInfo = this.#getImageInfo(imageData);
+    #writeImageToPDF(page, imageData, x, y, width, height, hash, format) {
+        const imageInfo = this.#getImageInfo(imageData, format);
+        if("data" in imageInfo) {
+            imageData = imageInfo.data;
+        }
         // const dims = this.#determineWidthAndHeight(width, height, imageInfo);
         const colorSpace = this.#getColorSpace(imageInfo.numComponents);
         if(typeof colorSpace === "undefined") throw new Error("Color Space를 가져오는데 실패하였습니다.");
-        this.#pageContent[this.#currentPage].image = {
+        this.#imageContent[hash] = {
             data: imageData,
             width: imageInfo.width,
             height: imageInfo.height,
+            colorSpace: colorSpace,
+            bitsPerComponent: 8,
+            connection: 1
+        }
+
+        if(this.#pageContent[page].image == undefined) {
+            this.#pageContent[page].image = [];
+        }
+        this.#pageContent[page].image.push({
+            hash: hash,
             x: x,
             y: y,
-            customWidth: width,
-            customHeight: height,
-            colorSpace: colorSpace,
-            bitsPerComponent: 8
-        }
+            width: width || imageInfo.width,
+            height: height || imageInfo.height
+        });
     }
 
     #markers = [0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7];
 
-    #getImageInfo(imgData) {
+    #getImageInfo(imgData, format) {
+        switch(format) {
+            case "JPEG": return this.#dataFromJPEG(imgData);
+            // case "PNG": return this.#PNGDataManager(imgData);
+        }
+    }
+
+    #PNGDataManager(imgData) {
+        const image = this.#dataFromPNG(imgData);
+        image.data = imgData;
+
+        return image;
+    }
+
+    #dataFromPNG(imgData) {
+        const width = imgData.charCodeAt(18) * 256 + imgData.charCodeAt(19);
+        const height = imgData.charCodeAt(22) * 256 + imgData.charCodeAt(23);
+        const bits = imgData.charCodeAt(24);
+        let numComponents = imgData.charCodeAt(25);
+        const hasAlphasChannel = numComponents == 4 || numComponents == 6;
+        switch(numComponents) {
+            case 0: case 3: case 4:
+                numComponents = 1;
+                break;
+            // case 2: case 6:
+            default:
+                numComponents = 3;
+                break;
+        }
+
+        return {
+            width: width,
+            height: height,
+            bits: bits,
+            numComponents: numComponents,
+            hasAlphasChannel: hasAlphasChannel,
+        };
+    }
+
+    #dataFromJPEG(imgData) {
         let blockLength = imgData.charCodeAt(4) * 256 + imgData.charCodeAt(5);
+        let width, height, numComponents;
         for(let i = 4; i < imgData.length; i+=2) {
             i += blockLength;
             if(this.#markers.indexOf(imgData.charCodeAt(i + 1)) != -1) {
-                const height = imgData.charCodeAt(i + 5) * 256 + imgData.charCodeAt(i + 6);
-                const width = imgData.charCodeAt(i + 7) * 256 + imgData.charCodeAt(i + 8);
-                const numComponents = imgData.charCodeAt(i + 9);
+                height = imgData.charCodeAt(i + 5) * 256 + imgData.charCodeAt(i + 6);
+                width = imgData.charCodeAt(i + 7) * 256 + imgData.charCodeAt(i + 8);
+                numComponents = imgData.charCodeAt(i + 9);
+                if(imgData.length > i + 420) {
+                    if(height == 1 && height < imgData.charCodeAt(i + 425) * 256 + imgData.charCodeAt(i + 426)) {
+                        height = imgData.charCodeAt(i + 425) * 256 + imgData.charCodeAt(i + 426);
+                        if(imgData.length > i + 427) {
+                            width = imgData.charCodeAt(i + 427) * 256 + imgData.charCodeAt(i + 428);
+                        }
+                    }
+                    if(numComponents == 1 && imgData.length > i + 429 && !(imgData.charCodeAt(i + 429) != 1 && imgData.charCodeAt(i + 429) != 3 && imgData.charCodeAt(i + 429) != 4))
+                        numComponents = imgData.charCodeAt(i + 429);
+                }
                 return { width: width, height: height, numComponents: numComponents };
             }else
                 blockLength = imgData.charCodeAt(i + 2) * 256 + imgData.charCodeAt(i + 3);
@@ -445,7 +577,7 @@ class PDFBuilder {
     }
 
     async #convertBase64ToBinaryString(value) {
-        if(this.#isBase64(value)) return value;
+        if(this.#isBase64(value)) return value.split(",")[1];
         if(typeof value == "object" && "src" in value) value = value.src;
         if(this.#isBlobURL(value)) {
             value = await fetch(value).then(r => r.blob());
@@ -454,12 +586,18 @@ class PDFBuilder {
             value = await value.arrayBuffer();
             value = new Uint8Array(value);
         }if(value instanceof Uint8Array) {
-            let result = "";
-            for(let i = 0; i < value.byteLength; i++) {
-                result += String.fromCharCode(value[i]);
-            }
-            return result;
+            return this.#arrayToBinaryString(value);
         }
+    }
+
+    #arrayToBinaryString(value) {
+        let result = "";
+        const len = value.byteLength || value.length;
+        for(let i = 0; i < len; i++) {
+            result += String.fromCharCode(value[i]);
+        }
+
+        return result;
     }
 
     #getImageFileTypeByImageData(imageData) {
@@ -522,5 +660,19 @@ class PDFBuilder {
             [0x49, 0x43], //IC - OS/2 struct icon
             [0x50, 0x54] //PT - OS/2 pointer
         ]};
+    }
+
+    #getImageHashCode(data) {
+        let hash = 0;
+        for(let i = 0; i < data.length; i++) {
+            hash = (hash << 5) - hash + data.charCodeAt(i);
+            hash |= 0;
+        }
+
+        return hash;
+    }
+
+    #getImageContentIndex(key) {
+        return Object.keys(this.#imageContent).indexOf(key);
     }
 }

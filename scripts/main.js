@@ -170,26 +170,13 @@ document.getElementsByClassName("transform")[0].onclick = () => {
     document.body.appendChild(downloadPage);
 
     const orientation = document.getElementsByClassName("pdfOptionOrientation")[0].value;
-    const util = document.getElementsByClassName("pdfOptionUtil")[0].value;
     const format = document.getElementsByClassName("pdfOptionFormat")[0].value;
     const imageList = document.getElementsByClassName("imageBox");
-    const multiple = (() => {
-        switch(util) {
-            case "pt":
-                return 0.75;
-            case "mm":
-                return 0.2645833333;
-            case "cm":
-                return 0.02645833333333;
-            case "in":
-                return 0.01041666666667;
-        }
-    })();
     const compress = document.getElementsByClassName("pdfOptionCompress")[0].value;
 
     setTimeout(() => {
         if(location.protocol.startsWith("http") && !!Worker) {
-            imageListPDFByThread(downloadPage, orientation, util, format, multiple, imageList, compress).catch((e) => {
+            imageListPDFByThread(downloadPage, orientation, format, imageList, compress).catch((e) => {
                 console.error(e);
                 downloadPage.remove();
                 alert((() => {
@@ -202,7 +189,7 @@ document.getElementsByClassName("transform")[0].onclick = () => {
                 })());
             });
         }else {
-            imageListPDF(downloadPage, orientation, util, format, multiple, imageList, compress).catch((e) => {
+            imageListPDF(downloadPage, orientation, format, imageList, compress).catch((e) => {
                 console.error(e);
                 downloadPage.remove();
                 alert((() => {
@@ -241,7 +228,7 @@ const imageFileAdd = file => {
     canvas.setAttribute("class", "imageCanvas");
 
     const image = document.createElement("img");
-    image.src = URL.createObjectURL(new Blob([file], {type: file.type}));
+    image.src = URL.createObjectURL(new Blob([file], {type: "image/jpeg"}));
 
     canvas.appendChild(image);
     imageItem.appendChild(canvas);
@@ -252,7 +239,31 @@ const imageFileAdd = file => {
     fileName.innerText = file.name;
     imageDivBox.appendChild(fileName);
 
-    loc.insertBefore(imageDivBox, plusBtn);
+    const imageLoadend = () => {
+        image.removeEventListener("load", imageLoadend);
+        const canvas = document.createElement("canvas");
+        const width = image.naturalWidth;
+        const height = image.naturalHeight;
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d");
+        context.drawImage(image, 0, 0, width, height);
+        if(canvas.toBlob)
+            canvas.toBlob(done, "image/jpeg");
+        else
+            done(canvas.toDataURL("image/jpeg"));
+    }
+
+    image.addEventListener("load", imageLoadend);
+        
+    function done(result) {
+        if(typeof result == "string") {
+            result = new Blob(result.split(",")[1], "image/jpeg");
+        }
+        URL.revokeObjectURL(image.src);
+        image.src = URL.createObjectURL(result);
+        loc.insertBefore(imageDivBox, plusBtn);
+    }
 
     image.ondragstart = () => {
         if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }

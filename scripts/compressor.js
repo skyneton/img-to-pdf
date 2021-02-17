@@ -124,7 +124,7 @@ class Compressor {
         if(result) {
             if(!this.size || result.size > this.size) {
                 (async () => {
-                    result = await this.#getBlob();
+                    result = await this.#getBlob(result);
                 })();
             }else if(this.#isFile(file)) {
                 const date = new Date();
