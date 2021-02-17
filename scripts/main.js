@@ -228,7 +228,28 @@ const imageFileAdd = file => {
     canvas.setAttribute("class", "imageCanvas");
 
     const image = document.createElement("img");
-    image.src = URL.createObjectURL(new Blob([file], {type: "image/jpeg"}));
+    if(file.type == "image/jpeg")
+        image.src = URL.createObjectURL(new Blob([file], {type: file.type}));
+    else {
+        const convert = new Image();
+        convert.src = URL.createObjectURL(new Blob([file], {type: "image/jpeg"}));
+        convert.onload = () => {
+            const canvas = document.createElement("canvas");
+            const width = convert.naturalWidth;
+            const height = convert.naturalHeight;
+            canvas.width = width;
+            canvas.height = height;
+            const context = canvas.getContext("2d");
+            context.drawImage(convert, 0, 0, width, height);
+            URL.revokeObjectURL(convert.src);
+            if(canvas.toBlob)
+                canvas.toBlob(done, "image/jpeg");
+            else
+                done(canvas.toDataURL("image/jpeg"));
+            canvas.remove();
+            convert.remove();
+        };
+    }
 
     canvas.appendChild(image);
     imageItem.appendChild(canvas);
@@ -239,30 +260,13 @@ const imageFileAdd = file => {
     fileName.innerText = file.name;
     imageDivBox.appendChild(fileName);
 
-    const imageLoadend = () => {
-        image.removeEventListener("load", imageLoadend);
-        const canvas = document.createElement("canvas");
-        const width = image.naturalWidth;
-        const height = image.naturalHeight;
-        canvas.width = width;
-        canvas.height = height;
-        const context = canvas.getContext("2d");
-        context.drawImage(image, 0, 0, width, height);
-        if(canvas.toBlob)
-            canvas.toBlob(done, "image/jpeg");
-        else
-            done(canvas.toDataURL("image/jpeg"));
-    }
-
-    image.addEventListener("load", imageLoadend);
+    loc.insertBefore(imageDivBox, plusBtn);
         
     function done(result) {
         if(typeof result == "string") {
             result = new Blob(result.split(",")[1], "image/jpeg");
         }
-        URL.revokeObjectURL(image.src);
         image.src = URL.createObjectURL(result);
-        loc.insertBefore(imageDivBox, plusBtn);
     }
 
     image.ondragstart = () => {
