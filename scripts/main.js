@@ -228,28 +228,26 @@ const imageFileAdd = file => {
     canvas.setAttribute("class", "imageCanvas");
 
     const image = document.createElement("img");
-    if(file.type == "image/jpeg")
-        image.src = URL.createObjectURL(new Blob([file], {type: file.type}));
-    else {
-        const convert = new Image();
-        convert.src = URL.createObjectURL(new Blob([file], {type: "image/jpeg"}));
-        convert.onload = () => {
-            const canvas = document.createElement("canvas");
-            const width = convert.naturalWidth;
-            const height = convert.naturalHeight;
-            canvas.width = width;
-            canvas.height = height;
-            const context = canvas.getContext("2d");
-            context.drawImage(convert, 0, 0, width, height);
-            URL.revokeObjectURL(convert.src);
-            if(canvas.toBlob)
-                canvas.toBlob(done, "image/jpeg");
-            else
-                done(canvas.toDataURL("image/jpeg"));
-            canvas.remove();
-            convert.remove();
-        };
-    }
+    const convert = new Image();
+    convert.src = URL.createObjectURL(file);
+    convert.onload = () => {
+        const canvas = document.createElement("canvas");
+        const width = convert.naturalWidth;
+        const height = convert.naturalHeight;
+        canvas.width = width;
+        canvas.height = height;
+        context.fillStyle = "white";
+        context.fillRect(0, 0, width, height);
+        const context = canvas.getContext("2d");
+        context.drawImage(convert, 0, 0, width, height);
+        URL.revokeObjectURL(convert.src);
+        if(canvas.toBlob)
+            canvas.toBlob(done, "image/jpeg");
+        else
+            done(canvas.toDataURL("image/jpeg"));
+        canvas.remove();
+        convert.remove();
+    };
 
     canvas.appendChild(image);
     imageItem.appendChild(canvas);
