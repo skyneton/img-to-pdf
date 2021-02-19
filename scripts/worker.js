@@ -144,7 +144,7 @@ const imageListPDF = (downloadPage, orientation, format, imageList, compress) =>
         for(let i = 0; i < imageList.length; i++) {
             while(doc.getNumberOfPages() < i + 1) doc.addPage();
             const img = imageList[i].getElementsByTagName("img")[0];
-            if(img.src = "") {
+            if(img.src == "") {
                 img.onload = () => {
                     getImageSrc(img.src, compress, quality).then(result => {
                         addImage(doc, i, result, img.naturalWidth, img.naturalHeight, format, name, index, imageList.length, downloadPage, compress != 0);
@@ -208,7 +208,7 @@ const imageListPDFByThread = (downloadPage, orientation, format, imageList, comp
         
         for(let i = 0; i < imageList.length; i++) {
             const img = imageList[i].getElementsByTagName("img")[0];
-            if(img.src = "") {
+            if(img.src == "") {
                 img.onload = () => {
                     getImageSrc(img.src, compress, quality).then(result => {
                         const data = {

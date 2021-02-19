@@ -232,15 +232,14 @@ const imageFileAdd = file => {
     convert.src = URL.createObjectURL(file);
     convert.onload = () => {
         const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
         const width = convert.naturalWidth;
         const height = convert.naturalHeight;
         canvas.width = width;
         canvas.height = height;
         context.fillStyle = "white";
         context.fillRect(0, 0, width, height);
-        const context = canvas.getContext("2d");
         context.drawImage(convert, 0, 0, width, height);
-        URL.revokeObjectURL(convert.src);
         if(canvas.toBlob)
             canvas.toBlob(done, "image/jpeg");
         else
@@ -261,6 +260,7 @@ const imageFileAdd = file => {
     loc.insertBefore(imageDivBox, plusBtn);
         
     function done(result) {
+        URL.revokeObjectURL(convert.src);
         if(typeof result == "string") {
             result = new Blob(result.split(",")[1], "image/jpeg");
         }
