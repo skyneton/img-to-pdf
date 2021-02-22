@@ -3,11 +3,11 @@
 } *::-webkit-scrollbar {
     width: 8px;
 	height: 8px;
-    background-color: rgba(100, 100, 100, 0.7);
+    background-color: rgba(180, 180, 180, 0.9);
 	border-radius: 4px;
 } *::-webkit-scrollbar-thumb {
     border-radius: 4px;
-    background-color: rgba(180, 180, 180, 0.9);
+    background-color: rgba(100, 100, 100, 0.7);
 }
 body {
     position: fixed;
