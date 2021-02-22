@@ -1,11 +1,11 @@
-@media (max-width: 540px) {
+@media (max-width: 350px) {
     .topbarOptionsBox {
         display: none;
     }
     .transformBox {
         border-bottom: 2px solid rgb(194, 194, 194);
     }
-    
+
     .imageBox {
         width: 430px;
         height: 480px;
