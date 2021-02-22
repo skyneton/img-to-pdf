@@ -5,6 +5,37 @@
     .transformBox {
         border-bottom: 2px solid rgb(194, 194, 194);
     }
+    
+    .imageBox {
+        width: 430px;
+        height: 480px;
+    }.imageBox > .imageContainer {
+        height: 430px;
+    }.imageCanvas {
+        background-color: white;
+        display: inline-block;
+        margin: auto;
+        max-width: 420px;
+        max-height: 420px;
+        box-shadow: 1px 1px 3px gray;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }.imageCanvas img {
+        max-width: 420px;
+        max-height: 420px;
+    }.imageListBox[format="a"] .imageBox .imageCanvas {
+        width: 296px;
+        height: 420px;
+    }.imageListBox[format="b"] .imageBox .imageCanvas {
+        width: 420px;
+        height: 296px;
+    }
+
+    .fileAddBox {
+        margin: 120px;
+    }
+}@media (max-width: 540px) {
     .imageBox {
         width: 410px;
         height: 460px;
