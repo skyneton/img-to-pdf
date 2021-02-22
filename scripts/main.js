@@ -21,15 +21,11 @@ window.ondrop = () => {
     event.preventDefault();
     if(document.getElementsByClassName("downloadLoadingPage").length > 0) return false;
     const files = (() => {
+        const collator = new Intl.Collator("en", {numeric: true, sensitivity: "base"});
+        const sortResult = [...(event.target.files || event.dataTransfer.files)].sort((a, b) => collator.compare(a.name, b.name));
         if(document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type") == "up")
-            return [...(event.target.files || event.dataTransfer.files)].sort((a, b) => {
-                // const maxlength = a.name.length > b.name.length ? a.name.length : b.name.length;
-                return ((a.name == b.name) ? 0 : (a.name > b.name) ? 1 : -1);
-            });
-        return [...(event.target.files || event.dataTransfer.files)].sort((a, b) => {
-            // const maxlength = a.name.length > b.name.length ? a.name.length : b.name.length;
-            return ((a.name == b.name) ? 0 : (a.name < b.name) ? 1 : -1);
-        });
+            return sortResult;
+        return sortResult.reverse();
     })();
     for(let i = 0; i < files.length; i++) {
         imageFileAdd(files[i]);
@@ -40,16 +36,11 @@ window.ondrop = () => {
 document.getElementsByClassName("inpFile")[0].onchange = () => {
     if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     const files = (() => {
-        if(document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type") == "up") {
-            return [...(event.target.files || event.dataTransfer.files)].sort((a, b) => {
-                // const maxlength = a.name.length > b.name.length ? a.name.length : b.name.length;
-                return ((a.name == b.name) ? 0 : (a.name > b.name) ? 1 : -1);
-            });
-        }
-        return [...(event.target.files || event.dataTransfer.files)].sort((a, b) => {
-            // const maxlength = a.name.length > b.name.length ? a.name.length : b.name.length;
-            return ((a.name == b.name) ? 0 : (a.name < b.name) ? 1 : -1);
-        });
+        const collator = new Intl.Collator("en", {numeric: true, sensitivity: "base"});
+        const sortResult = [...(event.target.files || event.dataTransfer.files)].sort((a, b) => collator.compare(a.name, b.name));
+        if(document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type") == "up")
+            return sortResult;
+        return sortResult.reverse();
     })();
     for(let i = 0; i < files.length; i++) {
         imageFileAdd(files[i]);
@@ -62,21 +53,11 @@ document.getElementsByClassName("orderByCommandBtn")[0].onclick = () => {
     const plusBtn = document.getElementsByClassName("fileAddBox")[0];
     const list = [...document.getElementsByClassName("imageBox")];
     (() => {
-        if(document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type") == "up") {
-            return list.sort((a, b) => {
-                a = a.getElementsByClassName("imageName")[0].innerText;
-                b = b.getElementsByClassName("imageName")[0].innerText;
-                // const maxlength = a.name.length > b.name.length ? a.name.length : b.name.length;
-                return ((a == b) ? 0 :
-                    (a > b) ? 1 : -1);
-            });
-        }
-        return list.sort((a, b) => {
-            a = a.getElementsByClassName("imageName")[0].innerText;
-            b = b.getElementsByClassName("imageName")[0].innerText;
-            // const maxlength = a.name.length > b.name.length ? a.name.length : b.name.length;
-            return ((a == b) ? 0 : (a < b) ? 1 : -1);
-        });
+        const collator = new Intl.Collator("en", {numeric: true, sensitivity: "base"});
+        const sortResult = list.sort((a, b) => collator.compare(a.getElementsByClassName("imageName")[0].innerText, b.getElementsByClassName("imageName")[0].innerText));
+        if(document.getElementsByClassName("orderByCommandBtn")[0].getAttribute("data-type") == "up")
+            return sortResult;
+        return sortResult.reverse();
     })().forEach(item => {
         loc.insertBefore(item, plusBtn);
     });
