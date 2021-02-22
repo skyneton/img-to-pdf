@@ -1,41 +1,32 @@
-@media (max-width: 349px) {
-    .topbarOptionsBox {
-        display: none;
-    }
-    .transformBox {
-        border-bottom: 2px solid rgb(194, 194, 194);
-    }
-
+@media (max-width: 850px) {
     .imageBox {
-        width: 430px;
-        height: 480px;
-        margin-left: 0;
-        margin-right: 0;
+        width: 310px;
+        height: 360px;
     }.imageBox > .imageContainer {
-        height: 430px;
+        height: 310px;
     }.imageCanvas {
         background-color: white;
         display: inline-block;
         margin: auto;
-        max-width: 420px;
-        max-height: 420px;
+        max-width: 300px;
+        max-height: 300px;
         box-shadow: 1px 1px 3px gray;
         display: flex;
         align-items: center;
         justify-content: center;
     }.imageCanvas img {
-        max-width: 420px;
-        max-height: 420px;
+        max-width: 300px;
+        max-height: 300px;
     }.imageListBox[format="a"] .imageBox .imageCanvas {
-        width: 296px;
-        height: 420px;
+        width: 212px;
+        height: 300px;
     }.imageListBox[format="b"] .imageBox .imageCanvas {
-        width: 420px;
-        height: 296px;
+        width: 300px;
+        height: 212px;
     }
 
     .fileAddBox {
-        margin: 110px;
+        margin: 60px;
     }
 }@media (max-width: 540px) {
     .imageBox {
@@ -67,34 +58,18 @@
     .fileAddBox {
         margin: 110px;
     }
-}@media (max-width: 850px) {
-    .imageBox {
-        width: 310px;
-        height: 360px;
-    }.imageBox > .imageContainer {
-        height: 310px;
-    }.imageCanvas {
-        background-color: white;
-        display: inline-block;
-        margin: auto;
-        max-width: 300px;
-        max-height: 300px;
-        box-shadow: 1px 1px 3px gray;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }.imageCanvas img {
-        max-width: 300px;
-        max-height: 300px;
-    }.imageListBox[format="a"] .imageBox .imageCanvas {
-        width: 212px;
-        height: 300px;
-    }.imageListBox[format="b"] .imageBox .imageCanvas {
-        width: 300px;
-        height: 212px;
+}@media (max-width: 349px) {
+    .topbarOptionsBox {
+        display: none;
+    }
+    .transformBox {
+        border-bottom: 2px solid rgb(194, 194, 194);
     }
 
-    .fileAddBox {
-        margin: 60px;
+    .imageBox {
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 0;
+        padding-right: 0;
     }
 }
