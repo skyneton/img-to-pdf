@@ -2,7 +2,7 @@ const lang = {
     ko: {
         title: "이미지 PDF 변환",
         description: "이미지를 PDF로 변환합니다. 드래그 앤 드롭을 통해 이미지를 추가할 수 있습니다. 정렬: 이미지의 이름을 통해 정렬합니다. 압축: 변환된 PDF 사이즈를 줄입니다.",
-        topbarTopMenu: ["정보", "초기화", "변환하기"],
+        topbarTopMenu: ["사용방법", "초기화", "변환하기"],
         orderByBox: ["오름차순", "내림차순"],
         pdfOptionCompress: {
             title: "압축",
