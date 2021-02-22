@@ -9,6 +9,8 @@
     .imageBox {
         width: 430px;
         height: 480px;
+        margin-left: 0;
+        margin-right: 0;
     }.imageBox > .imageContainer {
         height: 430px;
     }.imageCanvas {
@@ -33,7 +35,7 @@
     }
 
     .fileAddBox {
-        margin: 120px;
+        margin: 110px;
     }
 }@media (max-width: 540px) {
     .imageBox {
