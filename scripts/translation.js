@@ -20,7 +20,7 @@ const lang = {
     jp: {
         title: "イメージを PDF に変換",
         description: "画像をPDFに変換します。 ドラッグ&ドロップで画像を追加できます。 並べ替え:画像の名前を通して並べ替えます。 圧縮:変換されたPDF サイズを小さくします。",
-        topbarTopMenu: ["情報", "しょきか", "へんかん"],
+        topbarTopMenu: ["使用方法", "しょきか", "へんかん"],
         orderByBox: ["しょうじゅん", "こうじゅん"],
         pdfOptionCompress: {
             title: "あっしゅく",
@@ -38,7 +38,7 @@ const lang = {
     en: {
         title: "Image to PDF",
         description: "Convert the image to PDF. You can add images through drag and drop. Sort — Sorts through the name of the image. Compression: Reduce the converted PDF size.",
-        topbarTopMenu: ["Info", "Clear", "Convert"],
+        topbarTopMenu: ["How to use", "Clear", "Convert"],
         orderByBox: ["Ascending", "Descending"],
         pdfOptionCompress: {
             title: "Compress",
