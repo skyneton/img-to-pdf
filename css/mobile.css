@@ -58,18 +58,46 @@
     .fileAddBox {
         margin: 110px;
     }
-}@media (max-width: 349px) {
+}@media (max-width: 430px) {
+    .imageBox {
+        width: 310px;
+        height: 360px;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 0;
+        padding-right: 0;
+    }.imageBox > .imageContainer {
+        height: 310px;
+    }.imageCanvas {
+        background-color: white;
+        display: inline-block;
+        margin: auto;
+        max-width: 300px;
+        max-height: 300px;
+        box-shadow: 1px 1px 3px gray;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }.imageCanvas img {
+        max-width: 300px;
+        max-height: 300px;
+    }.imageListBox[format="a"] .imageBox .imageCanvas {
+        width: 212px;
+        height: 300px;
+    }.imageListBox[format="b"] .imageBox .imageCanvas {
+        width: 300px;
+        height: 212px;
+    }
+
+    .fileAddBox {
+        margin: 60px;
+    }
+}
+@media (max-width: 349px) {
     .topbarOptionsBox {
         display: none;
     }
     .transformBox {
         border-bottom: 2px solid rgb(194, 194, 194);
-    }
-
-    .imageBox {
-        margin-left: 0;
-        margin-right: 0;
-        padding-left: 0;
-        padding-right: 0;
     }
 }
