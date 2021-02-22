@@ -22,7 +22,7 @@ const worker_function = () => {
             const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? doc.getPageHeight(page)/height : doc.getPageWidth(page)/width);
             const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
             const subHeight = (doc.getPageHeight(page) - height * persentage)/2;
-            doc.drawImage(src, subWidth, subHeight, doc.getPageWidth(page) - subWidth * 2, doc.getPageHeight(page) - subHeight * 2).then(() => { addData(); });
+            doc.drawImage(src, subWidth, subHeight, doc.getPageWidth(page) - subWidth * 2, doc.getPageHeight(page) - subHeight * 2).then(() => { addData(); }).catch(() =>{ addData(); });
         }
     }
     
@@ -82,7 +82,7 @@ const addImage = (doc, page, src, width, height, format, name, index, max, loadi
     };
     doc.setPage(page);
     if(format == "auto") {
-        doc.drawImage(src).then(() => { addData(); });
+        doc.drawImage(src).then(() => { addData(); }).catch(() =>{ addData(); });
     }else {
         const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? doc.getPageHeight(page)/height : doc.getPageWidth(page)/width);
         const subWidth = (doc.getPageWidth(page) - width * persentage)/2;

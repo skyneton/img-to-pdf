@@ -429,6 +429,8 @@ class PDFBuilder {
                         x: x,
                         y: y
                     });
+
+                    resolve("drawing finish");
                     return;
                 }
 
