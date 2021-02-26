@@ -1,7 +1,7 @@
 const setCookie = (name, value, day) => {
     const time = new Date();
     time.setTime(time.getTime() + (100 * 24 * 60 * 60 * day));
-    document.cookie = `${name}=${value};expires=${day.toUTCString()};path=/img-to-pdf`;
+    document.cookie = `${name}=${value};expires=${time.toUTCString()};path=/img-to-pdf`;
 };
 
 const getCookie = (name) => {
