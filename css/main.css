@@ -317,8 +317,9 @@ body {
 
 .version_not_supported {
     z-index: 999;
-}.version_not_supported, .img_to_pdf_info {
+}.version_not_supported {
     display: none;
+}.version_not_supported, .img_to_pdf_info {
     position: fixed;
     left: 0;
     right: 0;

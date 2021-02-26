@@ -6,19 +6,26 @@ let pdfBlockMove;
         document.getElementsByClassName("version_not_supported")[0].display = "block";
 })();
 
+(() => {
+    if(getCookie("beforeVisited")) {
+        document.getElementsByClassName("img_to_pdf_info")[0].style.display = "none";
+    }
+    setCookie("beforeVisited", true, 365);
+})();
+
 const fileDragOverEvent = event => {
     event.stopPropagation();
     event.preventDefault();
 };
 
 document.getElementsByClassName("info")[0].onclick = () => {
-    if(document.getElementsByClassName("img_to_pdf_info")[0].style.display == "") {
-        document.getElementsByClassName("img_to_pdf_info")[0].style.display = "block";
+    if(document.getElementsByClassName("img_to_pdf_info")[0].style.display == "none") {
+        document.getElementsByClassName("img_to_pdf_info")[0].style.display = null;
     }
 };
 
 document.getElementsByClassName("img_to_pdf_info")[0].onclick = () => {
-    document.getElementsByClassName("img_to_pdf_info")[0].style.display = null;
+    document.getElementsByClassName("img_to_pdf_info")[0].style.display = "none";
 };
 
 document.getElementsByClassName("fileAddBox")[0].onclick = () => {
