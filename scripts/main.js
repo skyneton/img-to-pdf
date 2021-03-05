@@ -232,25 +232,11 @@ const imageFileAdd = file => {
     canvas.setAttribute("class", "imageCanvas");
 
     const image = document.createElement("img");
-    const convert = new Image();
-    convert.src = URL.createObjectURL(file);
-    convert.onload = () => {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-        const width = convert.naturalWidth;
-        const height = convert.naturalHeight;
-        canvas.width = width;
-        canvas.height = height;
-        context.fillStyle = "white";
-        context.fillRect(0, 0, width, height);
-        context.drawImage(convert, 0, 0, width, height);
-        if(canvas.toBlob)
-            canvas.toBlob(done, "image/jpeg");
-        else
-            done(canvas.toDataURL("image/jpeg"));
-        canvas.remove();
-        convert.remove();
-    };
+    new JPEG(file, {
+        success(result) {
+            image.src = URL.createObjectURL(result);
+        }
+    });
 
     canvas.appendChild(image);
     imageItem.appendChild(canvas);
@@ -262,14 +248,6 @@ const imageFileAdd = file => {
     imageDivBox.appendChild(fileName);
 
     loc.insertBefore(imageDivBox, plusBtn);
-        
-    function done(result) {
-        URL.revokeObjectURL(convert.src);
-        if(typeof result == "string") {
-            result = new Blob(result.split(",")[1], "image/jpeg");
-        }
-        image.src = URL.createObjectURL(result);
-    }
 
     image.ondragstart = () => {
         if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
