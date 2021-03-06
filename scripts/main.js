@@ -1,4 +1,5 @@
 let pdfBlockMove;
+const jpeg = new JPEG();
 
 (() => {
     const canvas = document.createElement("canvas");
@@ -232,7 +233,7 @@ const imageFileAdd = file => {
     canvas.setAttribute("class", "imageCanvas");
 
     const image = document.createElement("img");
-    new JPEG(file, {
+    jpeg.start(file, {
         success(result) {
             image.src = URL.createObjectURL(result);
         }

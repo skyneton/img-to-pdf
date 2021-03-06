@@ -58,6 +58,8 @@ const worker_function = () => {
     }
 }
 
+const compressor = new Compressor();
+
 const addImage = (doc, page, src, width, height, format, name, index, max, loadingPage, revoke = false) => {
     const addData = () => {
         if(revoke) URL.revokeObjectURL(src);
@@ -102,7 +104,7 @@ const PDFCreate = (orientation, format) => {
 
 const imageCompress = (url, quality) => {
     return new Promise(resolve => {
-        new Compressor(url, {
+        compressor.start(url, {
             quality: quality,
             success(result) {
                 resolve(URL.createObjectURL(result));
