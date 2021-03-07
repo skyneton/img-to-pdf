@@ -1,6 +1,3 @@
-let pdfBlockMove;
-const jpeg = new JPEG();
-
 (() => {
     const canvas = document.createElement("canvas");
     if(!(canvas && canvas.getContext && canvas.getContext("2d") && JPEG)) {
@@ -13,6 +10,9 @@ const jpeg = new JPEG();
     }
     setCookie("beforeVisited", true, 365);
 })();
+
+let pdfBlockMove;
+const jpeg = new JPEG();
 
 const fileDragOverEvent = event => {
     event.stopPropagation();
