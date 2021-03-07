@@ -1,6 +1,11 @@
 (() => {
     const canvas = document.createElement("canvas");
-    if(!(canvas && canvas.getContext && canvas.getContext("2d") && JPEG)) {
+    const classSupported = (() => {
+        try {
+            return !!JPEG;
+        }catch { return false; }
+    })();
+    if(!(canvas && canvas.getContext && canvas.getContext("2d") && classSupported)) {
         document.getElementsByClassName("version_not_supported")[0].display = "block";
         document.getElementsByClassName("img_to_pdf_info")[0].style.display = "none";
         return;
