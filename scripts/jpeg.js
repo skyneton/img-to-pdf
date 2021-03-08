@@ -2,6 +2,8 @@ class JPEG {
     #worker;
     #WORKER_URL;
     #idx = [];
+    #toggle = 1;
+    #number = 0;
     
     constructor() {
         if(createImageBitmap && Worker && OffscreenCanvas) {
@@ -15,20 +17,39 @@ class JPEG {
         if(typeof file === "undefined" || typeof options === "undefined") {
             this.#fail(new Error("옵션값을 입력해주세요"), options);
         }
-        if(!(file instanceof File || file instanceof Blob)) {
+        if(!file instanceof File && !file instanceof Blob) {
             this.#fail(new Error("파일은 Blob나 File 형태여야 합니다."), options);
         }
 
-        if(!this.#worker || true)
-            this.#init(file, options);
-        else {
-            const id = this.#idx.length;
-            this.#idx[id] = options;
-            this.#worker.postMessage({file: file, return: id});
+        if(this.#number > 100 || Object.keys(this.#idx).length > 100) {
+            const a = setInterval(() => {
+                if(this.#number < 100 && Object.keys(this.#idx).length < 100) {
+                    if(!this.#worker || this.#toggle === 1)
+                        this.#init(file, options);
+                    else {
+                        this.#toggle *= -1;
+                        const id = this.#idx.length;
+                        this.#idx[id] = options;
+                        this.#worker.postMessage({file: file, return: id});
+                    }
+                    clearInterval(a);
+                }
+            }, 1e3);
+        }else {
+            if(!this.#worker || this.#toggle === 1)
+                this.#init(file, options);
+            else {
+                this.#toggle *= -1;
+                const id = this.#idx.length;
+                this.#idx[id] = options;
+                this.#worker.postMessage({file: file, return: id});
+            }
         }
     }
 
     #init(file, options) {
+        this.#number++;
+        this.#toggle *= -1;
         const temp = new Image();
         temp.onload = () => {
             this.#draw(temp, options);
@@ -62,7 +83,9 @@ class JPEG {
 
         canvas.remove();
         
+        const _this = this;
         function done(result) {
+            _this.#number--;
             URL.revokeObjectURL(image.src);
             image.remove();
             if(typeof result == "string") {

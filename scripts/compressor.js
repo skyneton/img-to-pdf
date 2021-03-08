@@ -2,6 +2,7 @@ class Compressor {
     #worker;
     #WORKER_URL;
     #idx = [];
+    #toggle = 1;
     
     constructor() {
         if(createImageBitmap && Worker && OffscreenCanvas && location.protocol.startsWith("http")) {
@@ -17,9 +18,10 @@ class Compressor {
         }
         if(typeof options.quality === "undefined")
             options.quality = 1;
-        if(!this.#worker || true)
+        if(!this.#worker || this.#toggle === 1)
             this.#init(file, options);
         else {
+            this.#toggle *= -1;
             const id = this.#idx.length;
             this.#idx[id] = options;
             this.#worker.postMessage({file: file, return: id, options: {
@@ -80,16 +82,17 @@ class Compressor {
             }
         }else
             this.#load(file, options, type, size, url, createURL);
-    }
+    };
 
     #load(file, options, type, size, url, createURL) {
+        this.#toggle *= -1;
         const image = new Image();
         image.onload = () => {
             this.#draw(file, options, image, type, size, url, createURL);
-        }
+        };
         image.onerror = () => {
             this.#fail(new Error("이미지 로드 실패"), options);
-        }
+        };
         image.src = url;
     }
 
