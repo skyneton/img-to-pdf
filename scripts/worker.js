@@ -71,6 +71,7 @@ const addImage = (doc, page, src, width, height, format, name, index, max, loadi
                 loadingPage.remove();
             }catch(e) {
                 loadingPage.remove();
+                console.error(e);
                 alert((() => {
                     if(document.title == "이미지 PDF 변환")
                         return "알수없는 오류!";

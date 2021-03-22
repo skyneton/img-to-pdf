@@ -203,7 +203,7 @@ function PDFBuilder() {
         };
     };
 
-    const toBlob = () => {
+    this.toBlob = function() {
         resetDocument();
         putHeader();
         putPages();
