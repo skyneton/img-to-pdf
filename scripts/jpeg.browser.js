@@ -16,9 +16,9 @@ function JPEG() {
             fail(new Error("파일은 Blob나 File 형태여야 합니다."), options);
         }
 
-        if(number > 120 && (!worker || Object.keys(idx).length > 120)) {
+        if(number > 100 && (!worker || Object.keys(idx).length > 100)) {
             const a = setInterval(() => {
-                if(number <= 120 || !worker && Object.keys(idx).length <= 120) {
+                if(number <= 100 || !worker && Object.keys(idx).length <= 100) {
                     if(!worker || number <= Object.keys(idx).length)
                         init(file, options);
                     else {
