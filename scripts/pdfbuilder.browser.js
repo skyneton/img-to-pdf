@@ -98,7 +98,7 @@ function PDFBuilder() {
         }
     };
 
-    this.setPageWidth = () => {
+    this.setPageWidth = function() {
         if(arguments.length == 0) throw new Error("너비를 입력해주세요.");
         let page, width;
         if(arguments.length >= 2) {
@@ -110,7 +110,7 @@ function PDFBuilder() {
         pageContent[page].media.width = width;
     };
 
-    this.setPageHeight = () => {
+    this.setPageHeight = function() {
         if(arguments.length == 0) throw new Error("너비를 입력해주세요.");
         let page, height;
         if(arguments.length >= 2) {
@@ -122,7 +122,7 @@ function PDFBuilder() {
         pageContent[page].media.height = height;
     };
 
-    this.getPageWidth = () => {
+    this.getPageWidth = function() {
         let page = arguments[0];
         if(typeof page == "undefined") page = currentPage;
         if(isNaN(page)) throw new Error("숫자를 입력해주세요.");
@@ -130,7 +130,7 @@ function PDFBuilder() {
         return pageContent[page].media.width;
     };
 
-    this.getPageHeight = () => {
+    this.getPageHeight = function() {
         let page = arguments[0];
         if(typeof page == "undefined") page = currentPage;
         if(isNaN(page)) throw new Error("숫자를 입력해주세요.");
@@ -384,14 +384,14 @@ function PDFBuilder() {
         write("%\xBA\xDF\xAC\xE0");
     };
 
-    const write = () => {
+    const write = function() {
         if(arguments.length == 0) throw new Error("작성 오류");
         const data = arguments.length == 1 ? arguments[0] : arguments.join(" ");
         contentLength += data.length + 1;
         content.push(data);
     };
 
-    this.drawImage = () => {
+    this.drawImage = function() {
         let imageData = arguments[0], x, y, w, h;
         if(typeof imageData == "undefined") throw new Error("이미지를 입력해주세요.");
         x = arguments[1] || "0";
@@ -418,7 +418,7 @@ function PDFBuilder() {
         return new Promise(resolve => {
             convertBase64ToBinaryString(imageData).then(base64 => {
                 const format = getImageFileTypeByImageData(base64);
-                if(isImageNotSupported(format)) throw new Error(`${format} 형식은 지원하지 않는 이미지입니다.`);
+                if(this.isImageNotSupported(format)) throw new Error(`${format} 형식은 지원하지 않는 이미지입니다.`);
 
                 const index = getImageHashCode(base64).toString();
                 if(imageContent[index] != undefined) {
