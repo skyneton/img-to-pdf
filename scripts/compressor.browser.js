@@ -1,56 +1,51 @@
-class Compressor {
-    #worker;
-    #WORKER_URL;
-    #idx = [];
-    #toggle = 1;
-    
-    constructor() {
-        if(createImageBitmap && Worker && OffscreenCanvas && location.protocol.startsWith("http")) {
-            this.#WORKER_URL = URL.createObjectURL(new Blob([`(${this.#threadWorker.toString()})()`]));
-            this.#worker = new Worker(this.#WORKER_URL);
-            this.#worker.addEventListener("message", this.#getThreadMessage(this));
-        }
-    }
+function Compressor() {
+    "use strict";
+    if(typeof new.target === "undefined")
+        throw new Error("Constructor must be called with new.");
 
-    start(file, options) {
+    let worker;
+    let WORKER_URL;
+    const idx = [];
+    let single = 0;
+    
+    this.start = (file, options) => {
         if(typeof file === "undefined" || typeof options === "undefined") {
             throw new Error("옵션값을 입력해주세요");
         }
         if(typeof options.quality === "undefined")
             options.quality = 1;
-        if(!this.#worker || this.#toggle === 1)
-            this.#init(file, options);
+        if(!worker || Object.keys(idx).length >= single)
+            init(file, options);
         else {
-            this.#toggle *= -1;
-            const id = this.#idx.length;
-            this.#idx[id] = options;
-            this.#worker.postMessage({file: file, return: id, options: {
+            const id = idx.length;
+            idx[id] = options;
+            worker.postMessage({file: file, return: id, options: {
                 scale: options.scale,
                 quality: options.quality
             }});
         }
-    }
+    };
 
-    #init = (file, options) => {
+    const init = (file, options) => {
         let type, size = {}, url, createURL;
-        if(!this.#isType(file)) {
-            this.#fail(new Error("첫번째 파라미터는 File/Blob/URL/Base64(Image) 여야 합니다."), options);
+        if(!isType(file)) {
+            fail(new Error("첫번째 파라미터는 File/Blob/URL/Base64(Image) 여야 합니다."), options);
             return;
         }
 
         if(!URL) {
-            this.#fail(new Error("지원하지 않는 브라우저입니다."), options);
+            fail(new Error("지원하지 않는 브라우저입니다."), options);
             return;
         }
 
         if(options.quality <= 0) {
-            this.#fail(new Error("퀄리티는 0 초과의 수여야 합니다."), options);
+            fail(new Error("퀄리티는 0 초과의 수여야 합니다."), options);
         }
 
-        if(this.#isBase64(file)) {
+        if(isBase64(file)) {
             type = file.split(",")[0].split(";")[0].replaceAll("data:", "");
             size.size = atob(file.split(",")[1]).length;
-        }if(this.#isBlob(file) || this.#isFile(file)) {
+        }if(isBlob(file) || isFile(file)) {
             type = file.type;
             size.size = file.size;
         }
@@ -58,7 +53,7 @@ class Compressor {
             type = "image/jpeg";
 
         url = file;
-        if(this.#isBlob(file) || this.#isFile(file)) {
+        if(isBlob(file) || isFile(file)) {
             url = URL.createObjectURL(file);
             createURL = true;
         }
@@ -68,44 +63,46 @@ class Compressor {
                 size.size = blob.size;
             });
         }
+
+        single++;
         
 
         if(options.quality >= 1) {
-            if(this.#isBlob(file)) {
-                this.#done(file, options, file, type, size, url, createURL);
-            }else if(this.#isBase64(file)) {
-                this.#done(file, options, new Blob([this.#base64ToUInt(atob(file.split(",")[1]))], type), type, size, url, createURL);
-            }else if(this.#isBlobURL(file)) {
+            if(isBlob(file)) {
+                done(file, options, file, type, size, url, createURL);
+            }else if(isBase64(file)) {
+                done(file, options, new Blob([base64ToUInt(atob(file.split(",")[1]))], type), type, size, url, createURL);
+            }else if(isBlobURL(file)) {
                 fetch(file).then(r => r.blob()).then(blob => {
-                    this.#done(file, options, blob, type, size, url, createURL);
+                    done(file, options, blob, type, size, url, createURL);
                 });
             }
         }else
-            this.#load(file, options, type, size, url, createURL);
+            load(file, options, type, size, url, createURL);
     };
 
-    #base64ToUInt(data) {
+    const base64ToUInt = data => {
         const arr = new Uint8Array(data.length);
         for(let i = 0; i < data.length; i++) {
             arr[i] = data.charCodeAt(i);
         }
 
         return arr;
-    }
+    };
 
-    #load(file, options, type, size, url, createURL) {
-        this.#toggle *= -1;
+    const load = (file, options, type, size, url, createURL) => {
         const image = new Image();
         image.onload = () => {
-            this.#draw(file, options, image, type, size, url, createURL);
+            draw(file, options, image, type, size, url, createURL);
         };
         image.onerror = () => {
-            this.#fail(new Error("이미지 로드 실패"), options);
+            single--;
+            fail(new Error("이미지 로드 실패"), options);
         };
         image.src = url;
-    }
+    };
 
-    #draw(file, options, image, type, size, url, createURL) {
+    const draw = (file, options, image, type, size, url, createURL) => {
         const canvas = document.createElement("canvas"),
             context = canvas.getContext("2d"),
             aspectRatio = options.scale || (options.quality + 0.2 < 0.7 ? 0.7 : Math.min(1, options.quality + 0.2));
@@ -133,24 +130,23 @@ class Compressor {
         context.restore();
 
         if(canvas.toBlob) {
-            canvas.toBlob(done, type, options.quality);
+            canvas.toBlob(d, type, options.quality);
         }else {
-            this.#done(canvas.toDataURL(type, options.quality));
+            d(canvas.toDataURL(type, options.quality));
         }
 
-        const _this = this;
-        function done(result) {
-            _this.#done(file, options, result, type, size, url, createURL);
+        function d(result) {
+            done(file, options, result, type, size, url, createURL);
         }
-    }
+    };
 
-    #done(file, options, result, type, size, url, createURL) {
-        if(createURL && this.#isBlobURL(url)) URL.revokeObjectURL(url);
+    const done = (file, options, result, type, size, url, createURL) => {
+        if(createURL && isBlobURL(url)) URL.revokeObjectURL(url);
 
         if(result) {
             if(!size.size || result.size > size.size) {
-                this.#getBlob(file, type).then(blob => {result = blob});
-            }else if(this.#isFile(file)) {
+                getBlob(file, type).then(blob => {result = blob});
+            }else if(isFile(file)) {
                 const date = new Date();
                 result.lastModified = date.getTime();
                 result.lastModifiedDate = date;
@@ -159,70 +155,71 @@ class Compressor {
         }else {
             result = file;
         }
+        single--;
         if(options.success) {
             options.success(result);
         }
-    }
+    };
 
-    #getBlob(value, type) {
+    const getBlob = (value, type) => {
         return new Promise(resolve => {
-            if(this.#isFile(value)) resolve(new Blob(value, {type: type}));
-            else if(this.#isBase64(value)) resolve(new Blob([this.#base64ToUInt(atob(value.split(",")[1]))], {type: type}));
-            else if(this.#isBlobURL(value)) fetch(value).then(r => r.blob()).then(blob => resolve(blob));
+            if(isFile(value)) resolve(new Blob(value, {type: type}));
+            else if(isBase64(value)) resolve(new Blob([base64ToUInt(atob(value.split(",")[1]))], {type: type}));
+            else if(isBlobURL(value)) fetch(value).then(r => r.blob()).then(blob => resolve(blob));
             else resolve(value);
         });
-    }
+    };
 
-    #fail(err, options, id) {
-        if(id != undefined && id != null) delete this.#idx[id];
+    const fail = (err, options, id) => {
+        if(id != undefined && id != null) delete idx[id];
         if(options.error) {
             options.error(this, err);
         }else {
             throw err;
         }
-    }
+    };
 
-    #isType(value) {
+    const isType = value => {
         if(typeof Blob === "undefined") return false;
-        return this.#isFile(value) || this.#isBlob(value) || this.#isBlobURL(value) || this.#isBase64(value);
-    }
+        return isFile(value) || isBlob(value) || isBlobURL(value) || isBase64(value);
+    };
 
-    #isFile(value) {
+    const isFile = value => {
         return value instanceof File;
-    }
+    };
 
-    #isBlob(value) {
+    const isBlob = value => {
         return value instanceof Blob;
-    }
+    };
 
-    #isBlobURL(value) {
+    const isBlobURL = value => {
         return typeof value === "string" && value.startsWith("blob:");
-    }
+    };
 
-    #isBase64(value) {
+    const isBase64 = value => {
         return typeof value === "string" && value.startsWith("data:image");
-    }
+    };
 
-    #getThreadMessage = me => e => {
+    const getThreadMessage = e => {
         const packet = e.data,
-            options = me.#idx[packet.return];
+            options = idx[packet.return];
         if(!options) return;
         switch(packet.type) {
             case "success": {
                 if(options.success) {
                     options.success(packet.result);
-                    delete me.#idx[packet.return];
+                    delete idx[packet.return];
                 }
                 break;
             }
             case "error": {
-                me.#fail(packet.result, options, packet.return);
+                fail(packet.result, options, packet.return);
                 break;
             }
         }
     };
 
-    #threadWorker = () => {
+    const threadWorker = () => {
         self.addEventListener("message", e => {
             const packet = e.data;
             getBlob(packet.file).then(getBitMap(packet));
@@ -283,4 +280,10 @@ class Compressor {
             });
         }
     };
+    
+    if(createImageBitmap && Worker && OffscreenCanvas && location.protocol.startsWith("http")) {
+        WORKER_URL = URL.createObjectURL(new Blob([`(${threadWorker.toString()})()`]));
+        worker = new Worker(WORKER_URL);
+        worker.addEventListener("message", getThreadMessage);
+    }
 }
