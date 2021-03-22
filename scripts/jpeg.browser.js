@@ -80,7 +80,7 @@ function JPEG() {
         canvas.remove();
         
         function done(result) {
-            _number--;
+            number--;
             URL.revokeObjectURL(image.src);
             image.remove();
             if(typeof result == "string") {
