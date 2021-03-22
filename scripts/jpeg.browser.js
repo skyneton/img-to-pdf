@@ -42,7 +42,6 @@ function JPEG() {
 
     const init = (file, options) => {
         number++;
-        toggle *= -1;
         const temp = new Image();
         temp.onload = () => {
             draw(temp, options);
