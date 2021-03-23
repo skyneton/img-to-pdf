@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>이미지 PDF 변환 - 이미지를 무료로 PDF 변환</title>
-    <link rel="shortcut icon" href="logo.png">
-    <link rel="alternate" hreflang="x-default" href="https://skyneton.github.io/img-to-pdf/index.html"/>
-    <script type="text/javascript" src="scripts/cookie.js" defer></script>
-    <script type="text/javascript" src="scripts/jpeg.browser.min.js" defer></script>
-    <script type="text/javascript" src="scripts/main.min.js" defer></script>
-    <script type="text/javascript" src="scripts/compressor.browser.min.js" defer></script>
-    <script type="text/javascript" src="scripts/pdfbuilder.browser.min.js" defer></script>
-    <script type="text/javascript" src="scripts/worker.min.js" defer></script>
-    <link rel="stylesheet" type="text/css" href="css/main.css">
-    <link rel="stylesheet" type="text/css" href="css/mobile.css">
+    <title>Image PDF Conversion - Free PDF Conversion of Images</title>
+    <link rel="shortcut icon" href="../logo.png">
+    <link rel="alternate" hreflang="x-default" href="https://skyneton.github.io/img-to-pdf/"/>
+    <script type="text/javascript" src="../scripts/cookie.js" defer></script>
+    <script type="text/javascript" src="../scripts/jpeg.browser.min.js" defer></script>
+    <script type="text/javascript" src="../scripts/main.min.js" defer></script>
+    <script type="text/javascript" src="../scripts/compressor.browser.min.js" defer></script>
+    <script type="text/javascript" src="../scripts/pdfbuilder.browser.min.js" defer></script>
+    <script type="text/javascript" src="../scripts/worker.min.js" defer></script>
     <meta property="og:type" content="website">
     <meta name="og:image" content="https://skyneton.github.io/img-to-pdf/logo.png">
-    <meta name="og:description" content="이미지를 PDF로 변환합니다. 드래그 앤 드롭을 통해 이미지를 추가할 수 있습니다. 정렬: 이미지의 이름을 통해 정렬합니다. 압축: 변환된 PDF 사이즈를 줄입니다.">
-    <meta name="og:title" content="IMAGE PDF 변환">
+    <meta name="og:description" content="Convert the image to PDF. You can add images through drag and drop. Sort — Sorts through the name of the image. Compression: Reduce the converted PDF size.">
+    <meta name="og:title" content="IMAGE to PDF">
+    <link rel="stylesheet" type="text/css" href="../css/main.css">
+    <link rel="stylesheet" type="text/css" href="../css/mobile.css">
     <script data-ad-client="ca-pub-6721850843093132" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <meta name="google-site-verification" content="hTc644-ILZwLh9uoPb_cGmk1Ny_q55tuotRNOC4Or3o" />
     <meta name="naver-site-verification" content="4d7c469fe41711b6568463e769baeb339e13849c" />
@@ -26,39 +26,39 @@
     <input class="inpFile" type="file" accept="image/webp,image/bmp,image/dib,image/jfif,image/pjpeg,image/jpeg,image/pjp,image/jpg,image/png,image/tiff,image/tif,image/gif" multiple>
     <header class="topbar">
         <div class="topbarTopMenu">
-            <button class="info">사용방법</button>
-            <button class="clear">초기화</button>
-            <button class="transform">변환하기</button>
+            <button class="info">How to use</button>
+            <button class="clear">Clear</button>
+            <button class="transform">Convert</button>
         </div>
         <div class="topbarOptionsBox">
             <div class="orderByBox">
-                <button class="orderByCommandBtn" data-type="up">오름차순</button>
+                <button class="orderByCommandBtn" data-type="up">Ascending</button>
                 <button class="orderByTypeBtn">
                     <svg viewBox="0 0 16 16">
                         <path d="M13.3333 4L14.6666 5.33333L7.99992 12L1.33325 5.33333L2.66659 4L7.99992 9.5L13.3333 4Z"></path>
                     </svg>
                 </button>
                 <div class="orderByOptionSet">
-                    <button class="orderByOptionItem" data-type="down">내림차순</button>
+                    <button class="orderByOptionItem" data-type="down">Descending</button>
                 </div>
             </div>
 
-            <select class="pdfOptionSetting pdfOptionCompress">
-                <option value="0" selected>무손실</option>
-                <option value="1">저손실</option>
-                <option value="2">손실</option>
-                <option value="3">고손실</option>
+            <select class="pdfOptionSetting pdfOptionCompress" title="Compress">
+                <option value="0" selected>Not</option>
+                <option value="1">Low</option>
+                <option value="2">Middle</option>
+                <option value="3">High</option>
             </select>
 
-            <select class="pdfOptionSetting pdfOptionFormat">
+            <select class="pdfOptionSetting pdfOptionFormat" title="page">
                 <option value="a3">A3</option>
                 <option value="a4">A4</option>
                 <option value="a5">A5</option>
-                <option value="auto" selected>자동</option>
+                <option value="auto" selected>Auto</option>
             </select>
             <select class="pdfOptionSetting pdfOptionOrientation" disabled>
-                <option value="landscape">가로</option>
-                <option value="portrait" selected>세로</option>
+                <option value="landscape">Landscape</option>
+                <option value="portrait" selected>Portrait</option>
             </select>
         </div>
     </header>
@@ -74,32 +74,32 @@
                         <path d="M256,176h-48v-48c0-8.832-7.168-16-16-16c-8.832,0-16,7.168-16,16v48h-48c-8.832,0-16,7.168-16,16c0,8.832,7.168,16,16,16
                             h48v48c0,8.832,7.168,16,16,16c8.832,0,16-7.168,16-16v-48h48c8.832,0,16-7.168,16-16C272,183.168,264.832,176,256,176z"/>
                     </svg>
-                    <div>파일 추가<br>(혹은 드래그 드롭)</div>
+                    <div>File Add<br>(or Drag and Drop)</div>
                 </div>
             </div>
         </div>
     </div>
     <div class="version_not_supported">
         <div class="info_text_box">
-            지원하지 않는 버전입니다.
+            Unsupported browser or version.
         </div>
     </div>
     <div class="img_to_pdf_info">
         <div class="info_text_box">
-            이미지 PDF 변환<br><br>
-            변환하고 싶은 이미지 파일을 드래그 혹은, 파일 추가 버튼을 클릭 후 선택합니다.<br>
-            자동으로 정렬 버튼에 선택한 옵션대로 정렬됩니다.<br>
-            정렬을 다시 하고싶다면, 정렬 버튼 오른쪽 화살표에서 옵션 선택 후 버튼을 클릭시 정렬됩니다.<br>
-            만약 올린 이미지의 일부를 제거하고 싶다면
-            PC기준으로 이미지에 마우스를 올린 후 생기는 삭제 버튼을 클릭하여 삭제가 가능합니다.<br>
-            모바일 기준으로 이미지를 클릭후 생기는 삭제 버튼을 클릭하면 됩니다.<br>
-            이미지 위치를 변경하고 싶다면(PC에서만 가능)
-            이미지를 드래그 하여 원하는 이미지 위치로 올려놓습니다.
-            (주황색으로 추가되는 위치가 보여집니다.)<br>
-            상단에서 페이지 사이즈(기본 자동)를 선택시 페이지에 맞는 최대 크기로 이미지가 그려집니다.<br>
-            설정 완료 후 변환하기 버튼을 누르면 변환 후 자동으로 파일이 다운로드 됩니다.<br>
-            변환후 자동으로 이미지 목록이 초기화 되지 않으며, 상단의 초기화 버튼을 누를경우 초기화됩니다.<br><br>
-            이 화면은 사용방법 버튼 클릭시 확인이 가능합니다.
+            Image to PDF<br><br>
+            Drag the image file you want to convert, or click the Add File button and select it.<br>
+            The Sort button automatically sorts according to the options you select.<br>
+            If you want to re-align, select an option from the right arrow of the Sort button and click the button to sort.<br>
+            If you want to remove some of the uploaded images,
+            You can delete it by clicking the Delete button that occurs after you mouse over the image based on the PC.<br>
+            Click on the delete button that occurs after clicking on the image based on mobile.<br>
+            If you want to reposition the image (only available on PC)
+            Drag the image to the desired image position.
+            (This shows where it is added in orange.)<br>
+            When you select the page size (default auto) at the top, the image is drawn to the maximum size that fits the page.<br>
+            When you press the Convert button after completing the setup, the file is automatically downloaded after the conversion.<br>
+            The image list is not automatically initialized after the conversion; it is initialized when the initialization button at the top is pressed.<br><br>
+            You can check this screen by clicking the How to Use button.
         </div>
     </div>
     <svg class="deleteBtn" viewBox="-47 0 512 512">
