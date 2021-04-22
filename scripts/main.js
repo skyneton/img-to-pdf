@@ -215,7 +215,7 @@ document.getElementsByClassName("transform")[0].onclick = () => {
 };
 
 const imageFileAdd = file => {
-    if(!file.type.startsWith("image/") || file.type.includes("svg")) return;
+    if(!file.type.startsWith("image/") || file.type.includes("dds")) return;
     const imageDivBox = document.createElement("div");
     imageDivBox.setAttribute("class", "imageBox");
     imageDivBox.setAttribute("draggable", true);
