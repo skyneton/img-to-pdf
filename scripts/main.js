@@ -63,7 +63,6 @@ window.ondrop = () => {
 };
 
 document.getElementsByClassName("inpFile")[0].onchange = () => {
-    document.getElementsByClassName("inpFile")[0].value = null;
     if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     const files = (() => {
         const collator = new Intl.Collator("en", {numeric: true, sensitivity: "base"});
@@ -75,6 +74,7 @@ document.getElementsByClassName("inpFile")[0].onchange = () => {
     for(let i = 0; i < files.length; i++) {
         imageFileAdd(files[i]);
     }
+    document.getElementsByClassName("inpFile")[0].value = null;
 };
 
 document.getElementsByClassName("orderByCommandBtn")[0].onclick = () => {
