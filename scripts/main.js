@@ -63,7 +63,7 @@ window.ondrop = () => {
 };
 
 document.getElementsByClassName("inpFile")[0].onchange = () => {
-    document.getElementsByClassName("inpFile")[0] = null;
+    document.getElementsByClassName("inpFile")[0].value = null;
     if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     const files = (() => {
         const collator = new Intl.Collator("en", {numeric: true, sensitivity: "base"});
