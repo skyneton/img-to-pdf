@@ -55,8 +55,7 @@ const lang = {
     },
 };
 
-const languageSetting = () => {
-    const userLang = navigator.language || navigator.userLanguage;
+const languageSetting = (userLang) => {
     switch(userLang) {
         case "ko": case "ko-KR": {
             const topbarTopMenu = document.querySelectorAll(".topbarTopMenu [data-lang]");
@@ -99,6 +98,7 @@ const languageSetting = () => {
                 infoBox[i].innerHTML = lang.ko.infoDescription[i];
             }
             document.title = lang.ko.title;
+            document.getElementsByTagName("html")[0].setAttribute("lang", userLang);
             document.head.querySelector("meta[name=\"og:title\"]").setAttribute("content", lang.ko.title);
             document.head.querySelector("meta[name=\"og:description\"]").setAttribute("content", lang.ko.description);
             break;
@@ -144,6 +144,7 @@ const languageSetting = () => {
                 infoBox[i].innerHTML = lang.jp.infoDescription[i];
             }
             document.title = lang.jp.title;
+            document.getElementsByTagName("html")[0].setAttribute("lang", userLang);
             document.head.querySelector("meta[name=\"og:title\"]").setAttribute("content", lang.jp.title);
             document.head.querySelector("meta[name=\"og:description\"]").setAttribute("content", lang.jp.description);
             break;
@@ -190,6 +191,7 @@ const languageSetting = () => {
                 infoBox[i].innerHTML = lang.en.infoDescription[i];
             }
             document.title = lang.en.title;
+            document.getElementsByTagName("html")[0].setAttribute("lang", "en");
             document.head.querySelector("meta[name=\"og:title\"]").setAttribute("content", lang.en.title);
             document.head.querySelector("meta[name=\"og:description\"]").setAttribute("content", lang.en.description);
             break;
@@ -197,8 +199,8 @@ const languageSetting = () => {
     }   
 };
 
-languageSetting();
+languageSetting(navigator.language || navigator.userLanguage);
 
 window.onlanguagechange = () => {
-    languageSetting();
+    languageSetting(navigator.language || navigator.userLanguage);
 };

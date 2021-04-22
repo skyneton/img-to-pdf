@@ -63,6 +63,7 @@ window.ondrop = () => {
 };
 
 document.getElementsByClassName("inpFile")[0].onchange = () => {
+    document.getElementsByClassName("inpFile")[0] = null;
     if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     const files = (() => {
         const collator = new Intl.Collator("en", {numeric: true, sensitivity: "base"});
@@ -166,8 +167,6 @@ document.getElementsByClassName("clear")[0].onclick = () => {
 document.getElementsByClassName("transform")[0].onclick = () => {
     if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     if(document.getElementsByClassName("imageBox").length <= 0) return;
-
-    //https://www.giftofspeed.com/base64-encoder/
 
     const downloadPage = createLoadingPage((() => {
         if(document.title == "이미지 PDF 변환")
