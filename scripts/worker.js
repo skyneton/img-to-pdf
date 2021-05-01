@@ -73,9 +73,9 @@ const addImage = (doc, page, src, width, height, format, name, index, max, loadi
                 loadingPage.remove();
                 console.error(e);
                 alert((() => {
-                    if(document.title == "이미지 PDF 변환")
+                    if(document.title == "이미지 PDF 변환 - 이미지를 무료로 PDF 변환")
                         return "알수없는 오류!";
-                    if(document.title == "イメージを PDF に変換")
+                    if(document.title == "イメージを PDF に変換 - イメージを無料でPDF変換")
                         return "不明なエラーです。";
                     else
                         return "Unknown error!";
@@ -193,9 +193,9 @@ const imageListPDFByThread = (downloadPage, orientation, format, imageList, comp
                 case "error": {
                     downloadPage.remove();
                     alert((() => {
-                        if(document.title == "이미지 PDF 변환")
+                        if(document.title == "이미지 PDF 변환 - 이미지를 무료로 PDF 변환")
                             return "알수없는 오류!";
-                        if(document.title == "イメージを PDF に変換")
+                        if(document.title == "イメージを PDF に変換 - イメージを無料でPDF変換")
                             return "不明なエラーです。";
                         else
                             return "Unknown error!";

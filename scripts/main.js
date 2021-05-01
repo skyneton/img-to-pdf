@@ -169,9 +169,9 @@ document.getElementsByClassName("transform")[0].onclick = () => {
     if(document.getElementsByClassName("imageBox").length <= 0) return;
 
     const downloadPage = createLoadingPage((() => {
-        if(document.title == "이미지 PDF 변환")
+        if(document.title == "이미지 PDF 변환 - 이미지를 무료로 PDF 변환")
             return "PDF를 생성중입니다.";
-        if(document.title == "イメージを PDF に変換")
+        if(document.title == "イメージを PDF に変換 - イメージを無料でPDF変換")
             return "PDFを作成中です。";
         else
             return "Generating PDF.";
