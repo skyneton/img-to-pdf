@@ -240,6 +240,17 @@ const imageFileAdd = file => {
     jpeg.start(file, {
         success(result) {
             image.src = URL.createObjectURL(result);
+        },
+        error() {
+            alert((() => {
+                if(document.title == "이미지 PDF 변환")
+                    return "알수없는 오류!";
+                if(document.title == "イメージを PDF に変換")
+                    return "不明なエラーです。";
+                else
+                    return "Unknown error!";
+            })());
+            location.reload()
         }
     });
 

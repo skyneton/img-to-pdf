@@ -96,7 +96,7 @@ function JPEG() {
     const fail = (err, options, id) => {
         if(id != undefined && id != null) delete idx[id];
         if(options.error) {
-            options.error(this, err);
+            options.error(err);
         }else {
             throw err;
         }

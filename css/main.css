@@ -18,6 +18,7 @@ body {
     display: flex;
     flex-direction: column;
 	font-family: Inter, Roobert, Arial, Helvetica, sans-serif;
+    margin: 0;
 }body > .deleteBtn {
     display: none;
 }
