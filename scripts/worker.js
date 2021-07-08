@@ -126,7 +126,11 @@ const getImageSrc = (url, compress, percent) => {
 const imageListPDF = (downloadPage, orientation, format, imageList, compress) => {
     return new Promise(() => {
         const doc = PDFCreate(orientation, format);
-        const name = `${imageList[0].getElementsByClassName("imageName")[0].innerText.substring(imageList[0].getElementsByClassName("imageName")[0].innerText.lastIndexOf("."), 0)}.pdf`;
+        const name = (() => {
+            const n = imageList[0].getElementsByClassName("imageName")[0].innerText;
+            if(isNaN(n[n.length - 1]) && n.includes(".")) `${n.substring(0, n.lastIndexOf("."))}.pdf`;
+            return `${n}.pdf`;
+        })();
         const quality = (() => {
             switch(parseInt(compress)) {
                 case 1: return 0.8;

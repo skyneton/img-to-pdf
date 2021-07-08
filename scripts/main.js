@@ -45,7 +45,7 @@ window.ondragover = () => {
     event.preventDefault();
 };
 
-window.ondrop = () => {
+window.ondrop = async () => {
     event.stopPropagation();
     event.preventDefault();
     if(document.getElementsByClassName("downloadLoadingPage").length > 0) return false;
@@ -57,12 +57,13 @@ window.ondrop = () => {
         return sortResult.reverse();
     })();
     for(let i = 0; i < files.length; i++) {
-        imageFileAdd(files[i]);
+        if(files[i].type === "application/pdf") pdfFileAdd(files[i]);
+        else imageFileAdd(files[i]);
     }
     pdfBlockMove = undefined;
 };
 
-document.getElementsByClassName("inpFile")[0].onchange = () => {
+document.getElementsByClassName("inpFile")[0].onchange = async () => {
     if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
     const files = (() => {
         const collator = new Intl.Collator("en", {numeric: true, sensitivity: "base"});
@@ -72,6 +73,7 @@ document.getElementsByClassName("inpFile")[0].onchange = () => {
         return sortResult.reverse();
     })();
     for(let i = 0; i < files.length; i++) {
+        if(files[i].type === "application/pdf") pdfFileAdd(files[i]);
         imageFileAdd(files[i]);
     }
     document.getElementsByClassName("inpFile")[0].value = null;
@@ -169,9 +171,9 @@ document.getElementsByClassName("transform")[0].onclick = () => {
     if(document.getElementsByClassName("imageBox").length <= 0) return;
 
     const downloadPage = createLoadingPage((() => {
-        if(document.title == "이미지 PDF 변환 - 이미지를 무료로 PDF 변환")
+        if(document.title.includes("이미지 PDF 변환"))
             return "PDF를 생성중입니다.";
-        if(document.title == "イメージを PDF に変換 - イメージを無料でPDF変換")
+        if(document.title.includes("イメージを PDF に変換 - イメージを無料でPDF変換"))
             return "PDFを作成中です。";
         else
             return "Generating PDF.";
@@ -183,44 +185,39 @@ document.getElementsByClassName("transform")[0].onclick = () => {
     const imageList = document.getElementsByClassName("imageBox");
     const compress = document.getElementsByClassName("pdfOptionCompress")[0].value;
 
-    setTimeout(() => {
-        if(location.protocol.startsWith("http") && !!Worker) {
-            imageListPDFByThread(downloadPage, orientation, format, imageList, compress).catch((e) => {
-                console.error(e);
-                downloadPage.remove();
-                alert((() => {
-                    if(document.title == "이미지 PDF 변환")
-                        return "알수없는 오류!";
-                    if(document.title == "イメージを PDF に変換")
-                        return "不明なエラーです。";
-                    else
-                        return "Unknown error!";
-                })());
-            });
-        }else {
-            imageListPDF(downloadPage, orientation, format, imageList, compress).catch((e) => {
-                console.error(e);
-                downloadPage.remove();
-                alert((() => {
-                    if(document.title == "이미지 PDF 변환")
-                        return "알수없는 오류!";
-                    if(document.title == "イメージを PDF に変換")
-                        return "不明なエラーです。";
-                    else
-                        return "Unknown error!";
-                })());
-            });
-        }
-    }, 700);
+    if(location.protocol.startsWith("http") && !!Worker) {
+        imageListPDFByThread(downloadPage, orientation, format, imageList, compress).catch((e) => {
+            console.error(e);
+            downloadPage.remove();
+            alert((() => {
+                if(document.title.includes("이미지 PDF 변환"))
+                    return "알수없는 오류!";
+                if(document.title.includes("イメージを PDF に変換"))
+                    return "不明なエラーです。";
+                else
+                    return "Unknown error!";
+            })());
+        });
+    }else {
+        imageListPDF(downloadPage, orientation, format, imageList, compress).catch((e) => {
+            console.error(e);
+            downloadPage.remove();
+            alert((() => {
+                if(document.title.includes("이미지 PDF 변환"))
+                    return "알수없는 오류!";
+                if(document.title.includes("イメージを PDF に変換"))
+                    return "不明なエラーです。";
+                else
+                    return "Unknown error!";
+            })());
+        });
+    }
 };
 
-const imageFileAdd = file => {
-    if(!file.type.startsWith("image/") || file.type.includes("dds")) return;
+const createImageBox = name => {
     const imageDivBox = document.createElement("div");
     imageDivBox.setAttribute("class", "imageBox");
     imageDivBox.setAttribute("draggable", true);
-    const loc = document.getElementsByClassName("imageListBox")[0];
-    const plusBtn = document.getElementsByClassName("fileAddBox")[0];
     const copyDeleteBtnLoc = document.querySelector("body>.deleteBtn");
     const deleteBtn = copyDeleteBtnLoc.cloneNode();
     for(let i = 0; i < copyDeleteBtnLoc.children.length; i++) {
@@ -237,22 +234,6 @@ const imageFileAdd = file => {
     canvas.setAttribute("class", "imageCanvas");
 
     const image = document.createElement("img");
-    jpeg.start(file, {
-        success(result) {
-            image.src = URL.createObjectURL(result);
-        },
-        error() {
-            alert((() => {
-                if(document.title == "이미지 PDF 변환")
-                    return "알수없는 오류!";
-                if(document.title == "イメージを PDF に変換")
-                    return "不明なエラーです。";
-                else
-                    return "Unknown error!";
-            })());
-            location.reload()
-        }
-    });
 
     canvas.appendChild(image);
     imageItem.appendChild(canvas);
@@ -260,10 +241,8 @@ const imageFileAdd = file => {
     const fileName = document.createElement("div");
     fileName.setAttribute("class", "imageName");
     fileName.setAttribute("draggable", false);
-    fileName.innerText = file.name;
+    fileName.innerText = name;
     imageDivBox.appendChild(fileName);
-
-    loc.insertBefore(imageDivBox, plusBtn);
 
     image.ondragstart = () => {
         if(document.getElementsByClassName("downloadLoadingPage").length > 0) { event.preventDefault(); return false; }
@@ -325,6 +304,100 @@ const imageFileAdd = file => {
         URL.revokeObjectURL(image.src);
         imageDivBox.remove();
     };
+
+    return imageDivBox;
+};
+
+const pdfPageConvertImage = (imageDivBox, reader, page, fileName) => {
+    const image = imageDivBox.getElementsByClassName("imageContainer")[0].getElementsByTagName("img")[0];
+
+    const finishCheck = () => {
+        if(reader.numImageConverts >= reader.numPages) {
+            reader.close();
+            console.log(fileName, reader.pdfLoadedTime - Date.now(), "ms");
+        }
+    };
+
+    reader.getPageImage({
+        success(blob) {
+            image.src = URL.createObjectURL(blob);
+            finishCheck();
+        },
+        error(e) {
+            imageDivBox.remove();
+            alert((() => {
+                if(document.title.includes("이미지 PDF 변환"))
+                    return `알수없는 오류!\n${fileName} ${page}Page`;
+                if(document.title.includes("イメージを PDF に変換\n${file.name}"))
+                    return `不明なエラーです。\n${fileName} ${page}Page`;
+                else
+                    return `Unknown error!\n${fileName} ${page}Page`;
+            })());
+            console.error(e);
+            finishCheck();
+        }
+    }, page);
+}
+
+const pdfFileAdd = async file => {
+    try {
+        const reader = await loadendPdfReader(file);
+
+        const loc = document.getElementsByClassName("imageListBox")[0];
+        const plusBtn = document.getElementsByClassName("fileAddBox")[0];
+
+        for(let i = 0; i < reader.numPages; i++) {
+            const imageDivBox = createImageBox(`${file.name.substring(0, file.name.lastIndexOf("."))} ${i + 1}`);
+            loc.insertBefore(imageDivBox, plusBtn);
+            pdfPageConvertImage(imageDivBox, reader, i + 1, file.name);
+        }
+    }catch(e) {
+        console.error(e);
+    }
+
+    return true;
+};
+
+const loadendPdfReader = file => {
+    return new Promise((resolve, reject) => {
+        const reader = new PDFReader({
+            numWorkers: 3,
+            success() {
+                resolve(reader);
+            },
+            error(e) {
+                reject(e);
+            },
+        }, file);
+    });
+};
+
+const imageFileAdd = file => {
+    if(!file.type.startsWith("image/") || file.type.includes("dds")) return;
+    const loc = document.getElementsByClassName("imageListBox")[0];
+    const plusBtn = document.getElementsByClassName("fileAddBox")[0];
+
+    const imageDivBox = createImageBox(file.name);
+    loc.insertBefore(imageDivBox, plusBtn);
+
+    const image = imageDivBox.getElementsByClassName("imageContainer")[0].getElementsByTagName("img")[0];
+
+    jpeg.start(file, {
+        success(result) {
+            image.src = URL.createObjectURL(result);
+        },
+        error() {
+            alert((() => {
+                if(document.title.includes("이미지 PDF 변환"))
+                    return `알수없는 오류!\n${file.name}`;
+                if(document.title.includes("イメージを PDF に変換\n${file.name}"))
+                    return `不明なエラーです。\n${file.name}`;
+                else
+                    return `Unknown error!\n${file.name}`;
+            })());
+            imageDivBox.remove();
+        }
+    });
 };
 
 const dragDivLocation = e => {

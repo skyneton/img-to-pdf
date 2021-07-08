@@ -7,11 +7,16 @@
     <link rel="shortcut icon" href="../logo.png">
     <link rel="alternate" hreflang="x-default" href="https://skyneton.github.io/img-to-pdf/"/>
     <script type="text/javascript" src="../scripts/cookie.js" defer></script>
-    <script type="text/javascript" src="../scripts/jpeg.browser.min.js" defer></script>
+    <script type="text/javascript" src="../scripts/jpeg/jpeg.browser.min.js" defer></script>
     <script type="text/javascript" src="../scripts/main.min.js" defer></script>
-    <script type="text/javascript" src="../scripts/compressor.browser.min.js" defer></script>
-    <script type="text/javascript" src="../scripts/pdfbuilder.browser.min.js" defer></script>
+    <script type="text/javascript" src="../scripts/compressor/compressor.browser.min.js" defer></script>
+    <script type="text/javascript" src="../scripts/pdfbuilder/pdfbuilder.browser.min.js" defer></script>
     <script type="text/javascript" src="../scripts/worker.min.js" defer></script>
+    
+    <script src="scripts/pdf/pdf.min.js" defer></script>
+    <script src="scripts/pdf/pdf.worker.min.js" defer></script>
+    <script src="scripts/pdf/reader.min.js" defer></script>
+    
     <link rel="stylesheet" type="text/css" href="../css/main.css">
     <link rel="stylesheet" type="text/css" href="../css/mobile.css">
     <meta property="og:type" content="website">
@@ -21,9 +26,12 @@
     <script data-ad-client="ca-pub-6721850843093132" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <meta name="google-site-verification" content="hTc644-ILZwLh9uoPb_cGmk1Ny_q55tuotRNOC4Or3o" />
     <meta name="naver-site-verification" content="4d7c469fe41711b6568463e769baeb339e13849c" />
+    
+    <script type="text/javascript" src="https://skyneton.github.io/webCustomAlert/scripts/alert.min.js" defer></script>
+    <link rel="stylesheet" type="text/css" href="https://skyneton.github.io/webCustomAlert/css/alert.min.css"/>
 </head>
 <body>
-    <input class="inpFile" type="file" accept="image/svg+xml,image/webp,image/bmp,image/dib,image/jfif,image/pjpeg,image/jpeg,image/pjp,image/jpg,image/png,image/tiff,image/tif,image/gif" multiple>
+    <input class="inpFile" type="file" accept="application/pdf,image/svg+xml,image/webp,image/bmp,image/dib,image/jfif,image/pjpeg,image/jpeg,image/pjp,image/jpg,image/png,image/tiff,image/tif,image/gif" multiple>
     <header class="topbar">
         <div class="topbarTopMenu">
             <button class="info">使用方法</button>
