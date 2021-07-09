@@ -41,7 +41,7 @@ const worker_function = () => {
                 break;
             }
             case "image": {
-                while(doc.getNumberOfPages() < packet.page + 1) doc.addPage();
+                while(doc.numPages < packet.page + 1) doc.addPage();
                 addImage(packet.page, packet.src, packet.width, packet.height, packet.format, packet.max, packet.revoke);
                 break;
             }
@@ -149,7 +149,7 @@ const imageListPDF = (downloadPage, orientation, format, imageList, compress) =>
         compressTime = 0;
 
         for(let i = 0; i < imageList.length; i++) {
-            while(doc.getNumberOfPages() < i + 1) doc.addPage();
+            while(doc.numPages < i + 1) doc.addPage();
             const img = imageList[i].getElementsByTagName("img")[0];
             if(img.src == "") {
                 img.onload = () => {

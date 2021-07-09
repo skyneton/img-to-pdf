@@ -56,104 +56,6 @@ function PDFBuilder() {
         write(`${oid} 0 obj`);
     };
 
-    this.addPage = () => {
-        let orientation, format, rotate;
-        if(arguments.length > 1) {
-            if(typeof arguments[0] == "number") {
-                orientation = arguments[0];
-                format = arguments[1];
-                rotate = arguments[2];
-            }else {
-                orientation = arguments[0].orientation;
-                format = arguments[0].format;
-                rotate = arguments[0].rotate;
-            }
-        }
-
-        currentPage = pageContent.length;
-
-        if(typeof orientation == "undefined" && typeof format == "undefined" && typeof rotate == "undefined") {
-            pageContent[currentPage] = {
-                media: {
-                    width: defaultData.width,
-                    height: defaultData.height,
-                    format: defaultData.format,
-                    rotate: defaultData.rotate
-                }
-            }
-        }else {
-            orientation = orientation || defaultData.orientation;
-            format = format || defaultData.format;
-            rotate = rotate || defaultData.rotate;
-            const init = getPageInfo(orientation, format);
-
-            pageContent[currentPage] = {
-                media: {
-                    width: init.width,
-                    height: init.height,
-                    format: init.format,
-                    rotate: rotate
-                }
-            };
-        }
-    };
-
-    this.setPageWidth = function() {
-        if(arguments.length == 0) throw new Error("너비를 입력해주세요.");
-        let page, width;
-        if(arguments.length >= 2) {
-            page = arguments[0];
-            width = arguments[1];
-        }else width = arguments[0];
-        page = page | currentPage;
-        if(isNaN(page) || isNaN(width)) throw new Error("숫자 형태로 입력해주세요.");
-        pageContent[page].media.width = width;
-    };
-
-    this.setPageHeight = function() {
-        if(arguments.length == 0) throw new Error("너비를 입력해주세요.");
-        let page, height;
-        if(arguments.length >= 2) {
-            page = arguments[0];
-            height = arguments[1];
-        }else height = arguments[0];
-        page = page | currentPage;
-        if(isNaN(page) || isNaN(height)) throw new Error("숫자 형태로 입력해주세요.");
-        pageContent[page].media.height = height;
-    };
-
-    this.getPageWidth = function() {
-        let page = arguments[0];
-        if(typeof page == "undefined") page = currentPage;
-        if(isNaN(page)) throw new Error("숫자를 입력해주세요.");
-        if(page < 0 || Math.floor(page) != page) throw new Error("0 이상의 정수여야 합니다.");
-        return pageContent[page].media.width;
-    };
-
-    this.getPageHeight = function() {
-        let page = arguments[0];
-        if(typeof page == "undefined") page = currentPage;
-        if(isNaN(page)) throw new Error("숫자를 입력해주세요.");
-        if(page < 0 || Math.floor(page) != page) throw new Error("0 이상의 정수여야 합니다.");
-        return pageContent[page].media.height;
-    };
-
-    this.removePage = page => {
-        pageContent = pageContent.splice(page, 1);
-    };
-
-    this.setPage = page => {
-        currentPage = page;
-    };
-
-    this.getNumberOfPages = () => {
-        return pageContent.length;
-    };
-
-    this.getNowPage = () => {
-        return currentPage;
-    };
-
     const getPageInfo = (orientation, format) => {
         const pageFormats = {
             a0: [2384, 3370], a1: [1684, 2384], a2: [1191, 1684], a3: [842, 1191], a4: [595, 842], a5: [420, 595], a6: [298, 420], a7: [210, 298], a8: [147, 210], a9: [105, 147], a10: [74, 105],
@@ -203,41 +105,6 @@ function PDFBuilder() {
         };
     };
 
-    this.toBlob = function() {
-        resetDocument();
-        putHeader();
-        putPages();
-        putResources();
-        putCatalog();
-
-        const offsetOfXRef = contentLength;
-        putXRef();
-        putTrailer();
-        write("startxref");
-        write(`${offsetOfXRef}`);
-        write("%%EOF");
-
-        let size = 0;
-        for(let i = 0; i < content.length; i++) {
-            size += content[i].length + 1;
-        }
-        size--;
-
-        const arrayBuffer = new ArrayBuffer(size);
-        const uInt = new Uint8Array(arrayBuffer);
-
-        let len = 0;
-        for(let i = 0; i < content.length; i++) {
-            const tmp = content[i];
-            for(let j = 0; j < tmp.length; j++) {
-                uInt[len++] = tmp.charCodeAt(j);
-            }
-            uInt[len++] = 10;
-        }
-
-        return new Blob([arrayBuffer], {type: "appliocation/pdf"});
-    };
-
     const putResources = () => {
         const resources = [];
         if(Object.keys(imageContent).length > 0) {
@@ -245,7 +112,7 @@ function PDFBuilder() {
                 const data = imageContent[key];
                 const objId = newObjectDeferred();
                 newObjectDeferredBegin(objId);
-                write("<<");
+                writeNotNewLine("<<");
                 write("/Type /XObject");
                 write("/Subtype /Image");
                 write(`/Width ${data.width}`);
@@ -264,19 +131,19 @@ function PDFBuilder() {
         }
 
         newObjectDeferredBegin(resourceObjId);
-        write("<<");
+        writeNotNewLine("<<");
         write("/XObject <<");
         for(let i = 0; i < resources.length; i++) {
             write(`/I${i} ${resources[i]} 0 R`);
         }
         write(">>");
-        write(">>");
-        write("endobj");
+        writeNotNewLine(">>");
+        writeNotNewLine("endobj");
     };
 
     const putTrailer = () => {
         write("trailer");
-        write("<<");
+        writeNotNewLine("<<");
         write(`/Size ${objectNumber + 1}`);
         write(`/Root ${objectNumber} 0 R`);
         let fileId = "00000000000000000000000000000000";
@@ -301,11 +168,11 @@ function PDFBuilder() {
     const putCatalog = () => {
         const tmpRootDictionaryObjId = rootDirectoryObjId;
         newObjectDeferredBegin(newObjectDeferred());
-        write("<<");
+        writeNotNewLine("<<");
         write("/Type /Catalog");
         write(`/Pages ${tmpRootDictionaryObjId} 0 R`);
         write(">>");
-        write("endobj");
+        writeNotNewLine("endobj");
     };
 
     const putPages = () => {
@@ -314,17 +181,17 @@ function PDFBuilder() {
             kids += putPage(pageContent[i], newObjectDeferred(), resourceObjId, newObjectDeferred()) + " 0 R ";
         }
         newObjectDeferredBegin(rootDirectoryObjId);
-        write("<<");
+        writeNotNewLine("<<");
         write("/Type /Pages");
         write(kids + "]");
         write(`/Count ${pageContent.length}`);
         write(">>");
-        write("endobj");
+        writeNotNewLine("endobj");
     };
 
     const putPage = (data, objId, resourcesObjectId, contentsObjId) => {
         newObjectDeferredBegin(objId);
-        write("<<");
+        writeNotNewLine("<<");
         write("/Type /Page");
         write(`/Parent ${rootDirectoryObjId} 0 R`);
         if(typeof data.image != "undefined") {
@@ -345,11 +212,11 @@ function PDFBuilder() {
         }
         write(`/Contents ${contentsObjId} 0 R`);
         write(">>");
-        write("endobj");
+        writeNotNewLine("endobj");
 
         newObjectDeferredBegin(contentsObjId);
         if(data.image) {
-            write("<<");
+            writeNotNewLine("<<");
             let str = "";
             for(let i = 0; i < data.image.length; i++) {
                 if(i != 0) str += "\n";
@@ -381,7 +248,14 @@ function PDFBuilder() {
 
     const putHeader = () => {
         write("%PDF-1.4");
-        write("%\xBA\xDF\xAC\xE0");
+        //write("%\xBA\xDF\xAC\xE0");
+    };
+
+    const writeNotNewLine = function() {
+        if(arguments.length == 0) throw new Error("작성 오류");
+        const data = arguments.length == 1 ? arguments[0] : arguments.join(" ");
+        contentLength += data.length + 1;
+        content[content.length - 1] += data;
     };
 
     const write = function() {
@@ -391,34 +265,11 @@ function PDFBuilder() {
         content.push(data);
     };
 
-    this.drawImage = function() {
-        let imageData = arguments[0], x, y, w, h;
-        if(typeof imageData == "undefined") throw new Error("이미지를 입력해주세요.");
-        x = arguments[1] || "0";
-        y = arguments[2] || "0";
-        w = arguments[3];
-        h = arguments[4];
-
-        if(typeof imageData == "object" && "src" in imageData) {
-            w = w || imageData.naturalWidth;
-            h = h || imageData.naturalHeight;
-            imageData = imageData.src;
-        }
-
-        if(isNaN(x) || isNaN(y)) throw new Error("x, y는 숫자 형태여야 합니다.");
-        if(typeof x != "undefined") x = NumberRound(x, 5);
-        if(typeof y != "undefined") y = NumberRound(y, 5);
-        if(typeof w != "undefined") w = NumberRound(w, 5);
-        if(typeof h != "undefined") h = NumberRound(h, 5);
-
-        return drawImageToPDF(currentPage, imageData, x, y, w, h);
-    };
-
     const drawImageToPDF = (page, imageData, x, y, w, h) => {
         return new Promise(resolve => {
             convertBase64ToBinaryString(imageData).then(base64 => {
                 const format = getImageFileTypeByImageData(base64);
-                if(this.isImageNotSupported(format)) throw new Error(`${format} 형식은 지원하지 않는 이미지입니다.`);
+                if(Builder.isImageNotSupported(format)) throw new Error(`${format} 형식은 지원하지 않는 이미지입니다.`);
 
                 const index = getImageHashCode(base64).toString();
                 if(imageContent[index] != undefined) {
@@ -538,10 +389,6 @@ function PDFBuilder() {
             }else
                 blockLength = imgData.charCodeAt(i + 2) * 256 + imgData.charCodeAt(i + 3);
         }
-    };
-
-    this.isImageNotSupported = value => {
-        return !getImageFileTypeHeaders()[value];
     };
 
     const color_spaces = {
@@ -697,4 +544,172 @@ function PDFBuilder() {
     };
 
     initializer();
+
+    var Builder = new class {
+        addPage() {
+            let orientation, format, rotate;
+            if(arguments.length > 1) {
+                if(typeof arguments[0] == "number") {
+                    orientation = arguments[0];
+                    format = arguments[1];
+                    rotate = arguments[2];
+                }else {
+                    orientation = arguments[0].orientation;
+                    format = arguments[0].format;
+                    rotate = arguments[0].rotate;
+                }
+            }
+    
+            currentPage = pageContent.length;
+    
+            if(typeof orientation == "undefined" && typeof format == "undefined" && typeof rotate == "undefined") {
+                pageContent[currentPage] = {
+                    media: {
+                        width: defaultData.width,
+                        height: defaultData.height,
+                        format: defaultData.format,
+                        rotate: defaultData.rotate
+                    }
+                }
+            }else {
+                orientation = orientation || defaultData.orientation;
+                format = format || defaultData.format;
+                rotate = rotate || defaultData.rotate;
+                const init = getPageInfo(orientation, format);
+    
+                pageContent[currentPage] = {
+                    media: {
+                        width: init.width,
+                        height: init.height,
+                        format: init.format,
+                        rotate: rotate
+                    }
+                };
+            }
+        };
+
+        
+
+        setPageWidth() {
+            if(arguments.length == 0) throw new Error("너비를 입력해주세요.");
+            let page, width;
+            if(arguments.length >= 2) {
+                page = arguments[0];
+                width = arguments[1];
+            }else width = arguments[0];
+            page = page | currentPage;
+            if(isNaN(page) || isNaN(width)) throw new Error("숫자 형태로 입력해주세요.");
+            pageContent[page].media.width = width;
+        };
+
+        setPageHeight() {
+            if(arguments.length == 0) throw new Error("너비를 입력해주세요.");
+            let page, height;
+            if(arguments.length >= 2) {
+                page = arguments[0];
+                height = arguments[1];
+            }else height = arguments[0];
+            page = page | currentPage;
+            if(isNaN(page) || isNaN(height)) throw new Error("숫자 형태로 입력해주세요.");
+            pageContent[page].media.height = height;
+        };
+    
+        getPageWidth() {
+            let page = arguments[0];
+            if(typeof page == "undefined") page = currentPage;
+            if(isNaN(page)) throw new Error("숫자를 입력해주세요.");
+            if(page < 0 || Math.floor(page) != page) throw new Error("0 이상의 정수여야 합니다.");
+            return pageContent[page].media.width;
+        };
+    
+        PageHeight() {
+            let page = arguments[0];
+            if(typeof page == "undefined") page = currentPage;
+            if(isNaN(page)) throw new Error("숫자를 입력해주세요.");
+            if(page < 0 || Math.floor(page) != page) throw new Error("0 이상의 정수여야 합니다.");
+            return pageContent[page].media.height;
+        };
+    
+        removePage(page) {
+            pageContent = pageContent.splice(page, 1);
+        };
+    
+        setPage(page) {
+            currentPage = page;
+        };
+    
+        get numPages() {
+            return pageContent.length;
+        };
+    
+        get currentPage() {
+            return currentPage;
+        };
+
+        
+
+        toBlob() {
+            resetDocument();
+            putHeader();
+            putPages();
+            putResources();
+            putCatalog();
+
+            const offsetOfXRef = contentLength;
+            putXRef();
+            putTrailer();
+            write("startxref");
+            write(`${offsetOfXRef}`);
+            write("%%EOF");
+
+            let size = 0;
+            for(let i = 0; i < content.length; i++) {
+                size += content[i].length + 1;
+            }
+            size--;
+
+            const arrayBuffer = new ArrayBuffer(size);
+            const uInt = new Uint8Array(arrayBuffer);
+
+            let len = 0;
+            for(let i = 0; i < content.length; i++) {
+                const tmp = content[i];
+                for(let j = 0; j < tmp.length; j++) {
+                    uInt[len++] = tmp.charCodeAt(j);
+                }
+                uInt[len++] = 10;
+            }
+
+            return new Blob([arrayBuffer], {type: "appliocation/pdf"});
+        };
+        
+
+        drawImage() {
+            let imageData = arguments[0], x, y, w, h;
+            if(typeof imageData == "undefined") throw new Error("이미지를 입력해주세요.");
+            x = arguments[1] || "0";
+            y = arguments[2] || "0";
+            w = arguments[3];
+            h = arguments[4];
+
+            if(typeof imageData == "object" && "src" in imageData) {
+                w = w || imageData.naturalWidth;
+                h = h || imageData.naturalHeight;
+                imageData = imageData.src;
+            }
+
+            if(isNaN(x) || isNaN(y)) throw new Error("x, y는 숫자 형태여야 합니다.");
+            if(typeof x != "undefined") x = NumberRound(x, 5);
+            if(typeof y != "undefined") y = NumberRound(y, 5);
+            if(typeof w != "undefined") w = NumberRound(w, 5);
+            if(typeof h != "undefined") h = NumberRound(h, 5);
+
+            return drawImageToPDF(currentPage, imageData, x, y, w, h);
+        };
+
+        isImageNotSupported(value) {
+            return !getImageFileTypeHeaders()[value];
+        };
+    }
+    return Builder;
 }
