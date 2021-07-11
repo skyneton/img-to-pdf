@@ -335,7 +335,8 @@ const pdfPageConvertImage = (imageDivBox, reader, page, fileName) => {
             })());
             console.error(e);
             finishCheck();
-        }
+        },
+        scale: 96.0 / 72.0 * 0.8,
     }, page);
 }
 
