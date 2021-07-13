@@ -337,7 +337,11 @@ const pdfPageConvertImage = (imageDivBox, reader, page, fileName) => {
             finishCheck();
         },
         scale: 96.0 / 72.0 * 0.8,
-    }, page);
+        maxWidth: 1024,
+        maxHeight: 1024,
+        maxPixels: 524288,
+        page,
+    });
 }
 
 const pdfFileAdd = async file => {
@@ -369,7 +373,8 @@ const loadendPdfReader = file => {
             error(e) {
                 reject(e);
             },
-        }, file);
+            file,
+        });
     });
 };
 
@@ -421,13 +426,3 @@ const createLoadingPage = (msg) => {
 
     return box;
 };
-window.onkeydown = () => {
-    if(event.keyCode == 36) {
-        document.getElementsByClassName("imageListBox")[0].scrollTop = 0;
-        event.preventDefault();
-    }
-    else if(event.keyCode == 35) {
-        document.getElementsByClassName("imageListBox")[0].scrollTop = document.getElementsByClassName("imageListBox")[0].scrollHeight;
-        event.preventDefault();
-    }
-}
