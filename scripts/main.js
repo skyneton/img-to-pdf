@@ -388,6 +388,11 @@ const imageFileAdd = file => {
 
     const image = imageDivBox.getElementsByClassName("imageContainer")[0].getElementsByTagName("img")[0];
 
+    if(file.type == "image/jpeg") {
+        image.src = URL.createObjectURL(file);
+        return;
+    }
+    
     jpeg.start(file, {
         success(result) {
             image.src = URL.createObjectURL(result);
