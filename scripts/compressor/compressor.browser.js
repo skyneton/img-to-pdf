@@ -254,6 +254,9 @@ function Compressor() {
                 width = Math.floor(width * aspectRatio);
                 height = Math.floor(height * aspectRatio);
             }
+
+            canvas.width = width;
+            canvas.height = height;
     
             const fillStyle = "transparent";
             context.fillStyle = fillStyle;

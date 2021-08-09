@@ -190,7 +190,13 @@ const imageListPDFByThread = (downloadPage, orientation, format, imageList, comp
         worker.addEventListener("message", e => {
             switch(e.data.type) {
                 case "finish": {
-                    saveAs(e.data.data, `${imageList[0].getElementsByClassName("imageName")[0].innerText.substring(imageList[0].getElementsByClassName("imageName")[0].innerText.lastIndexOf("."), 0)}.pdf`);
+                    saveAs(e.data.data,
+                        (() => {
+                            const n = imageList[0].getElementsByClassName("imageName")[0].innerText;
+                            if(isNaN(n[n.length - 1]) && n.includes(".")) `${n.substring(0, n.lastIndexOf("."))}.pdf`;
+                            return `${n}.pdf`;
+                        })()
+                    );
                     downloadPage.remove();
                     break;
                 }
