@@ -318,6 +318,9 @@ const pdfPageConvertImage = (imageDivBox, reader, page, fileName) => {
         }
     };
 
+    let maxPixels = 268435456;
+    if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) maxPixels = 3145728;
+
     reader.getPageImage({
         success(blob) {
             image.src = URL.createObjectURL(blob);
@@ -336,10 +339,10 @@ const pdfPageConvertImage = (imageDivBox, reader, page, fileName) => {
             console.error(e);
             finishCheck();
         },
-        scale: 96.0 / 72.0 * 0.8,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        maxPixels: 524288,
+        scale: 96.0 / 72.0,
+        // maxWidth: 1024,
+        // maxHeight: 1024,
+        maxPixels,
         page,
     });
 }
