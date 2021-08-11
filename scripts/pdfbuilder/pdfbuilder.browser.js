@@ -622,7 +622,7 @@ function PDFBuilder() {
             return pageContent[page].media.width;
         };
     
-        PageHeight() {
+        getPageHeight() {
             let page = arguments[0];
             if(typeof page == "undefined") page = currentPage;
             if(isNaN(page)) throw new Error("숫자를 입력해주세요.");
