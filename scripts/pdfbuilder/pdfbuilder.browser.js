@@ -266,10 +266,10 @@ function PDFBuilder() {
     };
 
     const drawImageToPDF = (page, imageData, x, y, w, h) => {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             convertBase64ToBinaryString(imageData).then(base64 => {
                 const format = getImageFileTypeByImageData(base64);
-                if(Builder.isImageNotSupported(format)) throw new Error(`${format} 형식은 지원하지 않는 이미지입니다.`);
+                if(Builder.isImageNotSupported(format)) reject(new Error(`${format} 형식은 지원하지 않는 이미지입니다.`));
 
                 const index = getImageHashCode(base64).toString();
                 if(imageContent[index] != undefined) {
@@ -507,6 +507,7 @@ function PDFBuilder() {
         ],
         JPEG: [
             [ 0xff, 0xd8, 0xff, 0xe0, undefined, undefined, 0x4a, 0x46, 0x49, 0x46, 0x00 ], //JFIF
+            [ 0xff, 0xd8, 0xff, 0xe0, undefined, undefined, 0x4a, 0x46, 0x58, 0x58, 0x00 ],
             [ 0xff, 0xd8, 0xff, 0xe1, undefined, undefined, 0x45, 0x78, 0x69, 0x66, 0x00, 0x00 ], //Exif
             [0xff, 0xd8, 0xff, 0xdb], //JPEG RAW
             [0xff, 0xd8, 0xff, 0xee] //EXIF RAW

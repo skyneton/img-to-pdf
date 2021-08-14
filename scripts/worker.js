@@ -17,7 +17,7 @@ const worker_function = () => {
 
         doc.setPage(page);
         if(format == "auto") {
-            doc.drawImage(src).then(() => { addData(); });
+            doc.drawImage(src).then(() => { addData(); }).catch((e) => { console.error(e, src, page); addData(); });
         }else {
             const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? doc.getPageHeight(page)/height : doc.getPageWidth(page)/width);
             const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
@@ -85,7 +85,7 @@ const addImage = (doc, page, src, width, height, format, name, index, max, loadi
     };
     doc.setPage(page);
     if(format == "auto") {
-        doc.drawImage(src).then(() => { addData(); }).catch(() =>{ addData(); });
+        doc.drawImage(src).then(() => { addData(); }).catch((e) =>{ console.error(e, src, page); addData(); });
     }else {
         const persentage = ((doc.getPageWidth(page)/width > doc.getPageHeight(page)/height) ? doc.getPageHeight(page)/height : doc.getPageWidth(page)/width);
         const subWidth = (doc.getPageWidth(page) - width * persentage)/2;
